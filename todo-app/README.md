@@ -12,8 +12,8 @@ To deploy with kubectl:
 kubectl apply -f manifests/backend-deployment.yaml
 ```
 
-To access the backend, you can use port forwarding:
+To access the backend, you can create a service:
 
 ```shell
-kubectl port-forward <todo-backend-pod-name> 3000:3000
+kubectl apply -f manifests/backend-service.yaml
 ```
