@@ -5,7 +5,7 @@ First navigate to the `log-output` directory:
 cd log-output
 ```
 
-To create a deployment run the following command:
+To deploy with kubectl:
 ```shell
-kubectl apply -f manifests/deployment.yaml
+kubectl apply -f manifests
 ```
