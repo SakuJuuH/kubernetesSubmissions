@@ -29,17 +29,18 @@ func main() {
 		})
 	})
 
+	go func() {
+		for {
+			timestamp := getCurrentTimestamp()
+			fmt.Printf("%s: %s\n", timestamp, randomString)
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
 	err := router.Run(":" + port)
 	if err != nil {
 		return
 	}
-
-	for {
-		timestamp := getCurrentTimestamp()
-		fmt.Printf("%s: %s\n", timestamp, randomString)
-		time.Sleep(5 * time.Second)
-	}
-
 }
 
 func getCurrentTimestamp() string {
