@@ -3,5 +3,5 @@
 To deploy with kubectl:
 
 ```shell
-kubectl create deployment todo-app-backend --image=sakuheinonen/devops_kubernetes:1.2
+kubectl create deployment todo-backend --image=sakuheinonen/todo-backend:1.2
 ```
