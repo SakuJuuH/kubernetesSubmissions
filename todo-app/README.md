@@ -6,14 +6,8 @@ First navigate to the `todo-app` directory:
 cd todo-app
 ```
 
-To deploy with kubectl:
+To deploy with kubectl you can use the following command:
 
 ```shell
-kubectl apply -f manifests/backend-deployment.yaml
-```
-
-To access the backend, you can create a service:
-
-```shell
-kubectl apply -f manifests/backend-service.yaml
+kubectl apply -f manifests
 ```

@@ -7,9 +7,8 @@ spec:
     app: todo-backend
   ports:
     - protocol: TCP
-      port: 80
       targetPort: 3000
       name: http
-      nodePort: 30080
+      port: 2345
   type: NodePort
   
