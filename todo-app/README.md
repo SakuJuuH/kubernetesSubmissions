@@ -1,7 +1,13 @@
 # Todo app backend
 
+First navigate to the `todo-app` directory:
+
+```shell
+cd todo-app
+```
+
 To deploy with kubectl:
 
 ```shell
-kubectl create deployment todo-backend --image=sakuheinonen/todo-backend:1.2
+kubectl apply -f manifests/backend-deployment.yaml
 ```
