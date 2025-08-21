@@ -6,12 +6,11 @@ WORKDIR /app
 COPY go.mod go.mod
 COPY go.sum go.sum
 
-# Install necessary packages for building the Go application
 RUN go mod download
 
-COPY logOutput.go logOutput.go
+COPY logGenerator.go logGenerator.go
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -o main logOutput.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -o main logGenerator.go
 
 FROM alpine:latest
 WORKDIR /

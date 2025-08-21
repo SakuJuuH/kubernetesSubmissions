@@ -8,8 +8,9 @@ COPY go.sum go.sum
 
 RUN go mod download
 
-COPY main.go main.go
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -o main main.go
+COPY logReader.go logReader.go
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags reader -a -o main logReader.go
 
 FROM alpine:latest
 WORKDIR /
