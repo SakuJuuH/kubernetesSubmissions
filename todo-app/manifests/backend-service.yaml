@@ -10,5 +10,5 @@ spec:
       targetPort: 3000
       name: http
       port: 2345
-  type: NodePort
+  type: ClusterIP
   
