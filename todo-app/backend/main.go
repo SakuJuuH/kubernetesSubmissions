@@ -13,6 +13,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
@@ -24,5 +25,9 @@ func main() {
 
 	fmt.Printf("Server started in port %s\n", port)
 
-	router.Run(":" + port).Error()
+	err := router.Run(":" + port)
+	if err != nil {
+		fmt.Printf("Error starting server: %v\n", err)
+		os.Exit(1)
+	}
 }
