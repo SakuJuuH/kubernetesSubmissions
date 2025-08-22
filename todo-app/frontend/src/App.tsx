@@ -11,6 +11,11 @@ function App() {
   const [imageInfo, setImageInfo] = useState<ImageInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [todo, setTodo] = useState<string>('');
+
+  let [todos, setTodos] = useState<string[]>([
+      "Buy groceries", "Walk the dog", "Read a book"
+  ]);
 
   const backendUrl = import.meta.env.PROD 
     ? '/api'
@@ -51,6 +56,16 @@ function App() {
     }
   };
 
+  const handleAddTodo = async () => {
+      if (!todo.trim()) {
+        alert('Please enter a todo item.');
+        return;
+      }
+      todos.push(todo);
+      setTodos([...todos]);
+      setTodo('');
+  }
+
   return (
     <>
       <div>
@@ -68,7 +83,28 @@ function App() {
             />
           </div>
         )}
-        
+          <div className="todo" >
+              <input
+                  className="input"
+              type="text"
+              placeholder=""
+              value={todo}
+              onChange={(e) => setTodo(e.target.value)}
+          />
+              <button className="button" onClick={handleAddTodo}>
+                Add Todo
+              </button>
+          </div>
+
+          <div className="todo-list">
+              {
+                  todos ? (todos.map((item, index) => (
+                      <div key={index} className="todo-item">
+                        <span>{index + 1}. {item}</span>
+                      </div>
+                  ))) : "No todos available"
+              }
+          </div>
         <div style={{marginTop: '20px'}}>
           <button onClick={handleShutdown}>
             Shutdown Server (for testing)
