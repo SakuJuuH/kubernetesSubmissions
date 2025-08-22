@@ -61,6 +61,11 @@ function App() {
         alert('Please enter a todo item.');
         return;
       }
+
+      if (todo.length > 140) {
+        alert('Todo item cannot exceed 140 characters.');
+        return;
+      }
       todos.push(todo);
       setTodos([...todos]);
       setTodo('');
