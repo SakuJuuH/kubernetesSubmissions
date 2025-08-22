@@ -1,35 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app-backend
+  name: todo-app-frontend
   labels:
-    app: todo-app-backend
+    app: todo-app-frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: todo-app-backend
+      app: todo-app-frontend
   template:
     metadata:
-      name: todo-app-backend
+      name: todo-app-frontend
       labels:
-        app: todo-app-backend
+        app: todo-app-frontend
     spec:
       volumes:
         - name: shared-volume
           persistentVolumeClaim:
             claimName: shared-data-pvc
       containers:
-        - name: todo-app-backend
-          image: sakuheinonen/todo-backend:1.12.8
+        - name: todo-app-frontend
+          image: sakuheinonen/todo-frontend:1.12.8
           volumeMounts:
             - name: shared-volume
               mountPath: /usr/src/app/files
           env:
             - name: BACKEND_PORT
               value: "3000"
-            - name: IMAGE_DIR
-              value: "/usr/src/app/files/images"
+            - name: PROD
+              value: "true"
           resources:
             requests:
               memory: "64Mi"
