@@ -20,7 +20,7 @@
 
 ### Chapter 3
 
-- [2.1]()
+- [2.1](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.1/log-output)
 - [2.2]()
 - [2.3]()
 - [2.4]()

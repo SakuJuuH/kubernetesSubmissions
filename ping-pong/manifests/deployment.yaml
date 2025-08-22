@@ -12,13 +12,9 @@ spec:
       labels:
         app: ping-pong-app
     spec:
-      volumes:
-        - name: shared-volume
-          persistentVolumeClaim:
-            claimName: shared-data-pvc
       containers:
         - name: ping-pong-app
-          image: sakuheinonen/ping-pong:1.11
+          image: sakuheinonen/ping-pong:2.1
           env:
             - name: PORT
               value: "3050"
@@ -29,6 +25,3 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "100m"
-          volumeMounts:
-            - name: shared-volume
-              mountPath: /usr/src/app/files

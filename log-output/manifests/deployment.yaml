@@ -12,25 +12,9 @@ spec:
       labels:
         app: log-output
     spec:
-      volumes:
-        - name: shared-volume
-          persistentVolumeClaim:
-            claimName: shared-data-pvc
       containers:
-        - name: log-generator
-          image: sakuheinonen/log-output:generator-1.11
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "50m"
-            limits:
-              memory: "128Mi"
-              cpu: "100m"
-          volumeMounts:
-            - name: shared-volume
-              mountPath: /usr/src/app/files
-        - name: log-reader
-          image: sakuheinonen/log-output:reader-1.11
+        - name: log-output
+          image: sakuheinonen/log-output:2.1
           ports:
             - containerPort: 3030
           resources:
@@ -40,9 +24,8 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "100m"
-          volumeMounts:
-            - name: shared-volume
-              mountPath: /usr/src/app/files
           env:
             - name: PORT
               value: "3030"
+            - name: PING_PONG_URL
+              value: "http://ping-pong-svc:3080/"
