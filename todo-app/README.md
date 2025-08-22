@@ -6,8 +6,8 @@ First navigate to the `todo-app` directory:
 cd todo-app
 ```
 
-To deploy with kubectl you can use the following command:
+To deploy with kubectl with the persistence volume, you can use the following command:
 
 ```shell
-kubectl apply -f manifests
+kubectl apply -f ../manifests -f manifests
 ```
