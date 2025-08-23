@@ -25,7 +25,7 @@
 - [2.3](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.3/)
 - [2.4](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.4/)
 - [2.5](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.5/log-output) 
-- [2.6]()
+- [2.6](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.6/todo-app)
 - [2.7]()
 - [2.8]() 
 - [2.9]()

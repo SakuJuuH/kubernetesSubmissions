@@ -23,14 +23,13 @@ function App() {
 
     const [todoTask, setTodoTask] = useState<string>('');
 
-
     const imageServiceUrl = import.meta.env.PROD
         ? '/api/image'
-        : 'http://localhost:3000/api/image';
+        : 'http://localhost:3000/api/image'; // for local development
 
     const todoServiceUrl = import.meta.env.PROD
         ? '/api/todos'
-        : 'http://localhost:3002/api/todos';
+        : 'http://localhost:3002/api/todos'; // for local development
 
     useEffect(() => {
         const fetchImageInfo = async () => {

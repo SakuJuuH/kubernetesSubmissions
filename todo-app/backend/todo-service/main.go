@@ -15,18 +15,27 @@ type Todo struct {
 	Done bool   `json:"done"`
 }
 
+var (
+	port           = os.Getenv("PORT")
+	allowedOrigins = os.Getenv("ALLOWED_ORIGINS")
+)
+
 var todos = []Todo{}
-var port = os.Getenv("PORT")
 
 func main() {
 	if port == "" {
-		port = "3002"
+		fmt.Println("$PORT must be set")
+		os.Exit(1)
+	}
+
+	if allowedOrigins == "" {
+		allowedOrigins = "*"
 	}
 
 	router := gin.Default()
 
 	router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Origin", allowedOrigins)
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 

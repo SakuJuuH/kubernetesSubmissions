@@ -6,18 +6,42 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	imageUrl           = "https://picsum.photos/300"
-	imageCacheDuration = 10 * time.Minute
-	cachedImageName    = "current_image.jpg"
+var (
+	imageDirectory     = os.Getenv("IMAGE_DIR")
+	port               = os.Getenv("PORT")
+	imageUrl           = getEnvWithDefault("IMAGE_URL", "https://picsum.photos/300")
+	allowedOrigins     = getEnvWithDefault("ALLOWED_ORIGINS", "*")
+	cachedImageName    = getEnvWithDefault("CACHED_IMAGE_NAME", "current_image.jpg")
+	imageCacheDuration = getCacheDuration()
 )
 
-var imageDirectory = os.Getenv("IMAGE_DIR")
+func getEnvWithDefault(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+func getCacheDuration() time.Duration {
+	durationStr := os.Getenv("CACHE_DURATION_MINUTES")
+	if durationStr == "" {
+		return 10 * time.Minute
+	}
+
+	minutes, err := strconv.Atoi(durationStr)
+	if err != nil || minutes <= 0 {
+		fmt.Printf("Invalid CACHE_DURATION value '%s', defaulting to 10 minutes\n", durationStr)
+		return 10 * time.Minute
+	}
+
+	return time.Duration(minutes) * time.Minute
+}
 
 type ImageInfo struct {
 	Path     string    `json:"path"`
@@ -25,9 +49,9 @@ type ImageInfo struct {
 }
 
 func main() {
-	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		fmt.Println("$PORT must be set")
+		os.Exit(1)
 	}
 
 	if imageDirectory == "" {
@@ -45,7 +69,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Origin", allowedOrigins)
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
@@ -122,7 +146,12 @@ func downloadNewImage() (*ImageInfo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to download image: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Printf("Error closing response body: %v\n", err)
+		}
+	}(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to download image: HTTP %d", resp.StatusCode)
@@ -132,7 +161,12 @@ func downloadNewImage() (*ImageInfo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create image file: %v", err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			fmt.Printf("Error closing file %v: %v\n", file.Name(), err)
+		}
+	}(file)
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {

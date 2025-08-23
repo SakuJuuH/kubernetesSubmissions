@@ -23,15 +23,38 @@ spec:
             claimName: shared-data-pvc
       containers:
         - name: image-service
-          image: sakuheinonen/image-service:2.2
+          image: sakuheinonen/image-service:2.6
           volumeMounts:
             - name: shared-volume
               mountPath: /usr/src/app/files
           env:
             - name: PORT
               value: "3000"
+            - name: ALLOWED_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: ALLOWED_ORIGINS
+            - name: CACHE_DURATION_MINUTES
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: CACHE_DURATION_MINUTES
+            - name: IMAGE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: IMAGE_URL
             - name: IMAGE_DIR
-              value: "/usr/src/app/files/image"
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: IMAGE_DIR
+            - name: CACHED_IMAGE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: CACHED_IMAGE_NAME
           resources:
             requests:
               memory: "64Mi"

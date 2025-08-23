@@ -19,10 +19,15 @@ spec:
     spec:
       containers:
         - name: todo-service
-          image: sakuheinonen/todo-service:2.2
+          image: sakuheinonen/todo-service:2.6
           env:
             - name: PORT
               value: "3001"
+            - name: ALLOWED_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: ALLOWED_ORIGINS
           resources:
             requests:
               memory: "64Mi"
