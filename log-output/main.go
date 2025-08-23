@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -45,7 +44,6 @@ func main() {
 		fileContentStr = "file not found"
 	} else {
 		fileContentStr = string(fileContent)
-		fileContentStr = strings.Replace(fileContentStr, "\n", "", -1)
 	}
 
 	router := gin.Default()
@@ -61,7 +59,7 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{
 			"file content": fileContentStr,
-			"env variable": message,
+			"env variable": fmt.Sprintf("MESSAGE=%s", message),
 			timestamp:      randomString,
 			"Ping / Pongs": count,
 		})

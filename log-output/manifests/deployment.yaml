@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: log-output
-          image: sakuheinonen/log-output:2.5
+          image: sakuheinonen/log-output:2.5.1
           ports:
             - containerPort: 3030
           resources:
