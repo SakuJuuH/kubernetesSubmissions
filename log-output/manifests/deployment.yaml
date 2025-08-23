@@ -9,6 +9,8 @@ spec:
       app: log-output
   template:
     metadata:
+      namespace: exercises
+      name: log-output
       labels:
         app: log-output
     spec:

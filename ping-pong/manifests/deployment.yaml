@@ -9,6 +9,8 @@ spec:
       app: ping-pong-app
   template:
     metadata:
+      namespace: exercises
+      name: ping-pong-app
       labels:
         app: ping-pong-app
     spec:
