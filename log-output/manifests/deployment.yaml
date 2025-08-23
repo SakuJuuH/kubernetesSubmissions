@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: log-output
-          image: sakuheinonen/log-output:2.1
+          image: sakuheinonen/log-output:2.5
           ports:
             - containerPort: 3030
           resources:
@@ -34,3 +34,19 @@ spec:
               value: "3030"
             - name: PING_PONG_URL
               value: "http://ping-pong-svc:3080/"
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  key: MESSAGE
+                  name: log-output-config
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/src/app/files
+            readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: log-output-config
+            items:
+              - key: information.txt
+                path: information.txt

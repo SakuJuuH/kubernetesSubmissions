@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,17 +18,34 @@ type PingPongResp struct {
 	Pongs int64 `json:"pongs"`
 }
 
-var PingPongURL = os.Getenv("PING_PONG_URL")
+var (
+	port        = os.Getenv("PORT")
+	pingPongURL = os.Getenv("PING_PONG_URL")
+	message     = os.Getenv("MESSAGE")
+)
+
 var randomString = uuid.New().String()
 
 func main() {
-	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
 
-	if PingPongURL == "" {
-		PingPongURL = "http://localhost:3001/"
+	if pingPongURL == "" {
+		pingPongURL = "http://localhost:3001/"
+	}
+
+	if message == "" {
+		message = "env variable not set"
+	}
+
+	fileContent, err := os.ReadFile("/usr/src/app/files/information.txt")
+	var fileContentStr string
+	if err != nil {
+		fileContentStr = "file not found"
+	} else {
+		fileContentStr = string(fileContent)
+		fileContentStr = strings.Replace(fileContentStr, "\n", "", -1)
 	}
 
 	router := gin.Default()
@@ -42,19 +60,22 @@ func main() {
 		timestamp := time.Now().Format(time.RFC3339)
 
 		c.JSON(http.StatusOK, gin.H{
+			"file content": fileContentStr,
+			"env variable": message,
 			timestamp:      randomString,
 			"Ping / Pongs": count,
 		})
 	})
 
-	err := router.Run(":" + port)
+	err = router.Run(":" + port)
 	if err != nil {
-		return
+		fmt.Printf("Error starting server: %v\n", err)
+		os.Exit(1)
 	}
 }
 
 func getPingCount() (int64, error) {
-	u, err := url.Parse(PingPongURL)
+	u, err := url.Parse(pingPongURL)
 	if err != nil {
 		return 0, fmt.Errorf("unable to parse PING_PONG_URL: %w", err)
 	}
