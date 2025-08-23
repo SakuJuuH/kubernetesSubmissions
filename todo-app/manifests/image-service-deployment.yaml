@@ -1,35 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app-backend
+  name: image-service
   labels:
-    app: todo-app-backend
+    app: image-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: todo-app-backend
+      app: image-service
   template:
     metadata:
-      name: todo-app-backend
+      name: image-service
       labels:
-        app: todo-app-backend
+        app: image-service
     spec:
       volumes:
         - name: shared-volume
           persistentVolumeClaim:
             claimName: shared-data-pvc
       containers:
-        - name: todo-app-backend
-          image: sakuheinonen/todo-backend:1.13
+        - name: image-service
+          image: sakuheinonen/image-service:2.2
           volumeMounts:
             - name: shared-volume
               mountPath: /usr/src/app/files
           env:
-            - name: BACKEND_PORT
+            - name: PORT
               value: "3000"
             - name: IMAGE_DIR
-              value: "/usr/src/app/files/images"
+              value: "/usr/src/app/files/image"
           resources:
             requests:
               memory: "64Mi"

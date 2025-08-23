@@ -1,4 +1,4 @@
-module todo-app-backend
+module image-service
 
 go 1.24.3
 

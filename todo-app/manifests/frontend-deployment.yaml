@@ -21,12 +21,12 @@ spec:
             claimName: shared-data-pvc
       containers:
         - name: todo-app-frontend
-          image: sakuheinonen/todo-frontend:1.13
+          image: sakuheinonen/todo-frontend:2.2
           volumeMounts:
             - name: shared-volume
               mountPath: /usr/src/app/files
           env:
-            - name: BACKEND_PORT
+            - name: IMAGE_SERVICE_PORT
               value: "3000"
             - name: PROD
               value: "true"

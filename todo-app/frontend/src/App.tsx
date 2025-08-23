@@ -1,123 +1,167 @@
-import { useState, useEffect } from 'react'
+import {useEffect, useState} from 'react'
 import axios from 'axios'
 import './App.css'
 
 interface ImageInfo {
-  path: string;
-  cached_at: string;  
+    path: string;
+    cached_at: string;
+}
+
+interface Todo {
+    id: string;
+    task: string
+    done: boolean
 }
 
 function App() {
-  const [imageInfo, setImageInfo] = useState<ImageInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [todo, setTodo] = useState<string>('');
+    const [imageInfo, setImageInfo] = useState<ImageInfo | null>(null);
+    const [imageLoading, setImageLoading] = useState(true);
+    const [imageError, setImageError] = useState<string | null>(null);
+    const [todos, setTodos] = useState<Todo[]>([]);
+    const [todosLoading, setTodosLoading] = useState(false);
+    const [todosError, setTodosError] = useState<string | null>(null);
 
-  let [todos, setTodos] = useState<string[]>([
-      "Buy groceries", "Walk the dog", "Read a book"
-  ]);
+    const [todoTask, setTodoTask] = useState<string>('');
 
-  const backendUrl = import.meta.env.PROD 
-    ? '/api'
-    : 'http://localhost:3000/api';
 
-  useEffect(() => {
-      const fetchImageInfo = async () => {
-      try {
-        setLoading(true)
-        setError(null);
-    
-        const response = await axios.get<ImageInfo>(`${backendUrl}/image`);
-        
-        if (!response.data || !response.data.path) {
-          throw new Error('Invalid image data received');
+    const imageServiceUrl = import.meta.env.PROD
+        ? '/api/image'
+        : 'http://localhost:3000/api/image';
+
+    const todoServiceUrl = import.meta.env.PROD
+        ? '/api/todos'
+        : 'http://localhost:3002/api/todos';
+
+    useEffect(() => {
+        const fetchImageInfo = async () => {
+            try {
+                setImageLoading(true)
+                setImageError(null);
+
+                const response = await axios.get<ImageInfo>(`${imageServiceUrl}/current`);
+
+                if (!response.data || !response.data.path) {
+                    throw new Error('Invalid image data received');
+                }
+
+                setImageInfo(response.data);
+
+            } catch (error) {
+                console.error('Error fetching image:', error);
+                setImageError('Failed to fetch image');
+            } finally {
+                setImageLoading(false);
+            }
+        };
+
+        const fetchTodoItems = async () => {
+            try {
+                setTodosLoading(true);
+                setTodosError(null);
+
+                const response = await axios.get<Todo[]>(`${todoServiceUrl}`);
+
+                if (!response.data || !Array.isArray(response.data)) {
+                    throw new Error('Invalid todos data received');
+                }
+
+                setTodos(response.data);
+            } catch (error) {
+                console.error('Error fetching todos:', error);
+                setTodosError('Failed to fetch todos');
+            } finally {
+                setTodosLoading(false);
+            }
+        };
+
+        fetchImageInfo().then();
+        fetchTodoItems().then();
+    }, [imageServiceUrl, todoServiceUrl]);
+
+    const handleShutdown = async () => {
+        try {
+            await axios.post(`${imageServiceUrl}/shutdown`);
+            alert('Server shutdown initiated!');
+        } catch (error) {
+            console.error('Error shutting down server:', error);
         }
-
-        setImageInfo(response.data);
-        console.log(response.data);
-
-      } catch (error) {
-        console.error('Error fetching image:', error);
-        setError('Failed to fetch image');
-      } finally {
-        setLoading(false);
-      }
     };
 
-    fetchImageInfo().then();
-  }, [backendUrl]);
+    const handleAddTodo = async () => {
+        if (!todoTask.trim()) {
+            alert('Please enter a todo item.');
+            return;
+        }
 
-  const handleShutdown = async () => {
-    try {
-      await axios.post(`${backendUrl}/shutdown`);
-      alert('Server shutdown initiated!');
-    } catch (error) {
-      console.error('Error shutting down server:', error);
-    }
-  };
+        if (todoTask.length > 140) {
+            alert('Todo item cannot exceed 140 characters.');
+            return;
+        }
 
-  const handleAddTodo = async () => {
-      if (!todo.trim()) {
-        alert('Please enter a todo item.');
-        return;
-      }
+        try {
+            const response = await axios.post<Todo>(`${todoServiceUrl}`, {task: todoTask});
+            setTodos(prevTodos => [...prevTodos, response.data]);
+            setTodoTask('');
+        } catch (error) {
+            console.error('Error adding todo:', error);
+            alert('Failed to add todo item.');
+        }
+    };
 
-      if (todo.length > 140) {
-        alert('Todo item cannot exceed 140 characters.');
-        return;
-      }
-      todos.push(todo);
-      setTodos([...todos]);
-      setTodo('');
-  }
+    return (
+        <>
+            <div>
+                <h1>The Todo App</h1>
+                {imageLoading && <p>Loading image...</p>}
+                {imageError && <p style={{color: 'red'}}>{imageError}</p>}
 
-  return (
-    <>
-      <div>
-        <h1>The Todo App</h1>
-        {loading && <p>Loading image...</p>}
-        {error && <p style={{color: 'red'}}>{error}</p>}
-        
-        {imageInfo && !loading && (
-          <div>
-            <p>Image cached at: {new Date(imageInfo.cached_at).toLocaleString()}</p>
-            <img
-                src={`${backendUrl}${imageInfo.path}`}
-                alt="Random image from Picsum"
-                style={{maxWidth: '100%', height: 'auto'}}
-            />
-          </div>
-        )}
-          <div className="todo" >
-              <input
-                  className="input"
-              type="text"
-              placeholder=""
-              value={todo}
-              onChange={(e) => setTodo(e.target.value)}
-          />
-              <button className="button" onClick={handleAddTodo}>
-                Add Todo
-              </button>
-          </div>
-
-          <div className="todo-list">
-              {
-                  todos ? (todos.map((item, index) => (
-                      <div key={index} className="todo-item">
-                        <span>{index + 1}. {item}</span>
-                      </div>
-                  ))) : "No todos available"
-              }
-          </div>
-        <div style={{marginTop: '20px'}}>
-          <button onClick={handleShutdown}>
-            Shutdown Server (for testing)
-          </button>
-        </div>
-      </div>
-    </>
-  );
+                {imageInfo && !imageLoading && (
+                    <div>
+                        <p>Image cached at: {new Date(imageInfo.cached_at).toLocaleString()}</p>
+                        <img
+                            src={`${imageServiceUrl}${imageInfo.path}`}
+                            alt="Random image from Picsum"
+                            style={{maxWidth: '100%', height: 'auto'}}
+                        />
+                    </div>
+                )}
+                <div className="todo">
+                    <input
+                        className="input"
+                        type="text"
+                        placeholder=""
+                        value={todoTask}
+                        onChange={(e) => setTodoTask(e.target.value)}
+                    />
+                    <button className="button" onClick={handleAddTodo}>
+                        Add Todo
+                    </button>
+                </div>
+                {todosLoading && <p>Loading todos...</p>}
+                {todosError && <p style={{color: 'red'}}>{todosError}</p>}
+                {todos && !todosLoading && (
+                    <div className="todo-list">
+                        {
+                            todos.length > 0 ? (
+                                todos.map((todo) => (
+                                    <div key={todo.id} className="todo-item">
+                                       {todo.task}
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No todos available</p>
+                            )
+                        }
+                    </div>
+                )}
+                <div style={{marginTop: '20px'}}>
+                    <button onClick={handleShutdown}>
+                        Shutdown Server (for testing)
+                    </button>
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default App;

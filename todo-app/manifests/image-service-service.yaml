@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: todo-app-backend-svc
+  name: image-service-svc
 spec:
   selector:
-    app: todo-app-backend
+    app: image-service
   ports:
     - protocol: TCP
       targetPort: 3000

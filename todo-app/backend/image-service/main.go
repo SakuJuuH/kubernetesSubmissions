@@ -25,7 +25,7 @@ type ImageInfo struct {
 }
 
 func main() {
-	port := os.Getenv("BACKEND_PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
@@ -33,7 +33,7 @@ func main() {
 	if imageDirectory == "" {
 		cwd, _ := os.Getwd()
 		parentDir := filepath.Dir(cwd)
-		imageDirectory = filepath.Join(parentDir, "images")
+		imageDirectory = filepath.Join(parentDir, "image")
 	}
 
 	err := os.MkdirAll(imageDirectory, 0755)
@@ -57,23 +57,13 @@ func main() {
 		c.Next()
 	})
 
-	router.Static("/api/images", imageDirectory)
-
-	router.GET("/api/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Todo App API",
-			"status":  http.StatusOK,
-		})
-	})
+	router.Static("/api/image/files", imageDirectory)
 
 	router.GET("/api/image", func(c *gin.Context) {
-		imageInfo, err := getCachedImage()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, imageInfo)
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Image Service API",
+			"status":  http.StatusOK,
+		})
 	})
 
 	router.GET("/api/image/current", func(c *gin.Context) {
@@ -86,7 +76,7 @@ func main() {
 		c.JSON(http.StatusOK, imageInfo)
 	})
 
-	router.POST("/api/shutdown", func(c *gin.Context) {
+	router.POST("/api/image/shutdown", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Shutting down server..."})
 		go func() {
 			time.Sleep(1 * time.Second)
@@ -111,7 +101,7 @@ func getCachedImage() (*ImageInfo, error) {
 		if cacheAge < imageCacheDuration {
 			fmt.Printf("Serving cached image (cached %v ago)\n", cacheAge)
 			return &ImageInfo{
-				Path:     "/images/" + cachedImageName,
+				Path:     "/files/" + cachedImageName,
 				CachedAt: fileInfo.ModTime(),
 			}, nil
 		}
@@ -151,7 +141,7 @@ func downloadNewImage() (*ImageInfo, error) {
 
 	now := time.Now()
 	imageInfo := &ImageInfo{
-		Path:     "/images/" + cachedImageName,
+		Path:     "/files/" + cachedImageName,
 		CachedAt: now,
 	}
 

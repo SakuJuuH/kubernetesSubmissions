@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-service
+  labels:
+    app: todo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-service
+  template:
+    metadata:
+      name: todo-service
+      labels:
+        app: todo-service
+    spec:
+      containers:
+        - name: todo-service
+          image: sakuheinonen/todo-service:2.2
+          env:
+            - name: PORT
+              value: "3001"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+      
