@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: project
   name: todo-app-frontend
   labels:
     app: todo-app-frontend
@@ -11,6 +12,7 @@ spec:
       app: todo-app-frontend
   template:
     metadata:
+      namespace: project
       name: todo-app-frontend
       labels:
         app: todo-app-frontend
