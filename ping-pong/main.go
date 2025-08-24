@@ -1,27 +1,98 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 )
 
-func main() {
-	var port = os.Getenv("PORT")
+var (
+	port   = os.Getenv("PORT")
+	dbName = os.Getenv("POSTGRES_DB")
+	dbHost = os.Getenv("POSTGRES_HOST")
+	dbUser = os.Getenv("POSTGRES_USER")
+	dbPass = os.Getenv("POSTGRES_PASSWORD")
+	db     *sql.DB
+)
 
+func initDB() {
+	if dbHost == "" {
+		fmt.Println("DB_HOST environment variable not set")
+		os.Exit(1)
+	}
+
+	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", dbHost, dbUser, dbPass, dbName)
+
+	var err error
+	db, err = sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Fatal("Failed to ping database:", err)
+	}
+
+	// Create table if not exists
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS ping_counter (
+			id SERIAL PRIMARY KEY,
+			count BIGINT NOT NULL DEFAULT 0
+		)
+	`)
+	if err != nil {
+		log.Fatal("Failed to create table:", err)
+	}
+
+	// Initialize counter if not exists
+	_, err = db.Exec(`
+		INSERT INTO ping_counter (count) 
+		SELECT 0 
+		WHERE NOT EXISTS (SELECT 1 FROM ping_counter)
+	`)
+	if err != nil {
+		log.Fatal("Failed to initialize counter:", err)
+	}
+}
+
+func incrementCounter() (int64, error) {
+	var count int64
+	err := db.QueryRow(`
+		UPDATE ping_counter 
+		SET count = count + 1 
+		WHERE id = (SELECT MIN(id) FROM ping_counter)
+		RETURNING count
+	`).Scan(&count)
+	return count, err
+}
+
+func getCount() (int64, error) {
+	var count int64
+	err := db.QueryRow(`SELECT count FROM ping_counter WHERE id = (SELECT MIN(id) FROM ping_counter)`).Scan(&count)
+	return count, err
+}
+
+func main() {
 	if port == "" {
 		port = "3001"
 	}
 
+	initDB()
+	defer db.Close()
+
 	router := gin.Default()
 
-	var pongCounter int64 = 0
-
 	router.GET("/pingpong", func(c *gin.Context) {
-		count := atomic.AddInt64(&pongCounter, 1)
+		count, err := incrementCounter()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to increment count"})
+			return
+		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"pong": count,
@@ -29,8 +100,14 @@ func main() {
 	})
 
 	router.GET("/pings", func(c *gin.Context) {
+		count, err := getCount()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count"})
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"pongs": pongCounter,
+			"pongs": count,
 		})
 	})
 
