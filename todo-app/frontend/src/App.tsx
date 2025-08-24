@@ -110,14 +110,21 @@ function App() {
         }
 
         try {
+            console.log(`Adding todo: ${todoTask}`);
+
             const response = await axios.post<Todo>(`${todoServiceUrl}`, {task: todoTask});
             const data: Todo = response.data
+
             let newTodo: Todo = {
                 id: data.id,
                 task: data.task,
                 done: data.done,
             }
+
+            console.log(`Todo added:  ${newTodo.id} - ${newTodo.task} (${newTodo.done})`);
+
             let prevTodos = todos || [];
+
             setTodos([...prevTodos, newTodo]);
             setTodoTask('');
         } catch (error) {
