@@ -23,7 +23,7 @@ spec:
             claimName: shared-data-pvc
       containers:
         - name: image-service
-          image: sakuheinonen/image-service:2.6
+          image: sakuheinonen/image-service:2.8.2
           volumeMounts:
             - name: shared-volume
               mountPath: /usr/src/app/files

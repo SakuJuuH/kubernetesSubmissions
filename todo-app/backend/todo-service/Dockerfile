@@ -3,8 +3,7 @@ LABEL authors="sakuheinonen"
 
 WORKDIR /app
 
-COPY go.mod go.mod
-COPY go.sum go.sum
+COPY go.mod go.sum ./
 
 RUN go mod download
 

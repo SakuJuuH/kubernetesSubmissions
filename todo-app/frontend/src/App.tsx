@@ -8,7 +8,7 @@ interface ImageInfo {
 }
 
 interface Todo {
-    id: string;
+    id: number;
     task: string
     done: boolean
 }
@@ -29,7 +29,7 @@ function App() {
 
     const todoServiceUrl = import.meta.env.PROD
         ? '/api/todos'
-        : 'http://localhost:3002/api/todos'; // for local development
+        : 'http://localhost:3001/api/todos'; // for local development
 
     useEffect(() => {
         const fetchImageInfo = async () => {
@@ -38,12 +38,17 @@ function App() {
                 setImageError(null);
 
                 const response = await axios.get<ImageInfo>(`${imageServiceUrl}/current`);
-
-                if (!response.data || !response.data.path) {
+                const data: ImageInfo = response.data;
+                if (!data || !data.path) {
                     throw new Error('Invalid image data received');
                 }
 
-                setImageInfo(response.data);
+                let image: ImageInfo = {
+                    path: data.path,
+                    cached_at: data.cached_at,
+                }
+
+                setImageInfo(image);
 
             } catch (error) {
                 console.error('Error fetching image:', error);
@@ -59,12 +64,19 @@ function App() {
                 setTodosError(null);
 
                 const response = await axios.get<Todo[]>(`${todoServiceUrl}`);
+                const data: Todo[] = response.data;
 
-                if (!response.data || !Array.isArray(response.data)) {
+                if (!data || !Array.isArray(data)) {
                     throw new Error('Invalid todos data received');
                 }
 
-                setTodos(response.data);
+                const todos: Todo[] = data.map((item: Todo) => ({
+                    id: item.id,
+                    task: item.task,
+                    done: item.done,
+                }));
+
+                setTodos(todos);
             } catch (error) {
                 console.error('Error fetching todos:', error);
                 setTodosError('Failed to fetch todos');
@@ -99,7 +111,14 @@ function App() {
 
         try {
             const response = await axios.post<Todo>(`${todoServiceUrl}`, {task: todoTask});
-            setTodos(prevTodos => [...prevTodos, response.data]);
+            const data: Todo = response.data
+            let newTodo: Todo = {
+                id: data.id,
+                task: data.task,
+                done: data.done,
+            }
+            let prevTodos = todos || [];
+            setTodos([...prevTodos, newTodo]);
             setTodoTask('');
         } catch (error) {
             console.error('Error adding todo:', error);
@@ -130,6 +149,7 @@ function App() {
                         type="text"
                         placeholder=""
                         value={todoTask}
+                        onSubmit={handleAddTodo}
                         onChange={(e) => setTodoTask(e.target.value)}
                     />
                     <button className="button" onClick={handleAddTodo}>
@@ -142,9 +162,9 @@ function App() {
                     <div className="todo-list">
                         {
                             todos.length > 0 ? (
-                                todos.map((todo) => (
+                                todos.sort((a, b) => a.id - b.id).map((todo) => (
                                     <div key={todo.id} className="todo-item">
-                                       {todo.task}
+                                        {todo.id}. {todo.task}
                                     </div>
                                 ))
                             ) : (

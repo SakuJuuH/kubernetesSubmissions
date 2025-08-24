@@ -2,25 +2,45 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 type Todo struct {
-	ID   string `json:"id"`
-	Task string `json:"task"`
-	Done bool   `json:"done"`
+	ID   int    `json:"id" db:"id"`
+	Task string `json:"task" db:"task"`
+	Done bool   `json:"done" db:"done"`
 }
 
 var (
 	port           = os.Getenv("PORT")
 	allowedOrigins = os.Getenv("ALLOWED_ORIGINS")
+	dbHost         = os.Getenv("POSTGRES_HOST")
+	dbUser         = os.Getenv("POSTGRES_USER")
+	dbPass         = os.Getenv("POSTGRES_PASSWORD")
+	dbName         = os.Getenv("POSTGRES_DB")
+	db             *sqlx.DB
 )
 
-var todos = []Todo{}
+func getTodos() ([]Todo, error) {
+	todos := make([]Todo, 0)
+	err := db.Select(&todos, "SELECT id, task, done FROM todos")
+	return todos, err
+}
+
+func addTodo(task string) (Todo, error) {
+	var todo Todo
+	err := db.Get(&todo, "INSERT INTO todos (task) VALUES ($1) RETURNING id, task, done", task)
+	if err != nil {
+		return Todo{}, err
+	}
+	return todo, nil
+}
 
 func main() {
 	if port == "" {
@@ -31,6 +51,14 @@ func main() {
 	if allowedOrigins == "" {
 		allowedOrigins = "*"
 	}
+
+	initDB()
+	defer func(db *sqlx.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Printf("Error closing database: %v", err)
+		}
+	}(db)
 
 	router := gin.Default()
 
@@ -48,22 +76,30 @@ func main() {
 	})
 
 	router.GET("/api/todos", func(c *gin.Context) {
+		todos, err := getTodos()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, todos)
 	})
 
 	router.POST("/api/todos", func(c *gin.Context) {
-		var newTodo Todo
+		var requestTodo struct {
+			Task string `json:"task" binding:"required"`
+		}
 
-		if err := c.BindJSON(&newTodo); err != nil {
+		if err := c.BindJSON(&requestTodo); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		newTodo.ID = uuid.New().String()
-		newTodo.Done = false
+		newTodo, err := addTodo(requestTodo.Task)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
-		fmt.Printf("%+v\n", newTodo)
-		todos = append(todos, newTodo)
 		c.JSON(http.StatusCreated, newTodo)
 	})
 
@@ -72,5 +108,37 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error starting server: %v\n", err)
 		os.Exit(1)
+	}
+}
+
+func initDB() {
+	if dbHost == "" {
+		fmt.Println("DB_HOST environment variable not set")
+		os.Exit(1)
+	}
+
+	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", dbHost, dbUser, dbPass, dbName)
+
+	var err error
+	db, err = sqlx.Connect("postgres", connStr)
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Fatal("Failed to ping database:", err)
+	}
+
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS todos (
+			id SERIAL PRIMARY KEY,
+			task TEXT NOT NULL,
+			done BOOLEAN NOT NULL DEFAULT FALSE,
+			created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+		)
+	`)
+	if err != nil {
+		log.Fatal("Failed to create table:", err)
 	}
 }

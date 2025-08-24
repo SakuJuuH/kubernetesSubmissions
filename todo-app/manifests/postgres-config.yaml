@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: project
+data:
+  POSTGRES_HOST: "postgres-svc"
+  POSTGRES_DB: "todo-app"
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "password"
+
