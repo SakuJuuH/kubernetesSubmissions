@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: random-todo-cronjob
+  namespace: project
+  labels:
+    app: random-todo-cronjob
+spec:
+  schedule: "0 * * * *" # Every hour at minute 0
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: curl
+              image: curlimages/curl:8.4.0
+              args:
+                - /bin/sh
+                - -c
+                - |
+                  curl -X POST http://todo-service-svc.project.svc.cluster.local:2346/api/todos/random
+          restartPolicy: OnFailure

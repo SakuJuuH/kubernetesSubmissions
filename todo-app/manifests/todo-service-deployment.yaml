@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: todo-service
-          image: sakuheinonen/todo-service:2.8.5
+          image: sakuheinonen/todo-service:2.9.2
           env:
             - name: PORT
               value: "3001"
@@ -48,6 +48,11 @@ spec:
                 configMapKeyRef:
                   name: postgres-config
                   key: POSTGRES_PASSWORD
+            - name : RANDOM_ARTICLE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: RANDOM_ARTICLE_URL
           resources:
             requests:
               memory: "64Mi"

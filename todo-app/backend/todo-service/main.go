@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -18,13 +19,14 @@ type Todo struct {
 }
 
 var (
-	port           = os.Getenv("PORT")
-	allowedOrigins = os.Getenv("ALLOWED_ORIGINS")
-	dbHost         = os.Getenv("POSTGRES_HOST")
-	dbUser         = os.Getenv("POSTGRES_USER")
-	dbPass         = os.Getenv("POSTGRES_PASSWORD")
-	dbName         = os.Getenv("POSTGRES_DB")
-	db             *sqlx.DB
+	port             = os.Getenv("PORT")
+	allowedOrigins   = os.Getenv("ALLOWED_ORIGINS")
+	dbHost           = os.Getenv("POSTGRES_HOST")
+	dbUser           = os.Getenv("POSTGRES_USER")
+	dbPass           = os.Getenv("POSTGRES_PASSWORD")
+	dbName           = os.Getenv("POSTGRES_DB")
+	db               *sqlx.DB
+	randomArticleURL = os.Getenv("RANDOM_ARTICLE_URL")
 )
 
 func getTodos() ([]Todo, error) {
@@ -84,6 +86,38 @@ func main() {
 		c.JSON(http.StatusOK, todos)
 	})
 
+	router.POST("/api/todos/random", func(c *gin.Context) {
+		if randomArticleURL == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "RANDOM_ARTICLE_URL is not set"})
+			return
+		}
+
+		resp, err := http.Get(randomArticleURL)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		articleURL := resp.Request.URL.String()
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				log.Printf("Error closing response body: %v", err)
+			}
+		}(resp.Body)
+
+		task := fmt.Sprintf("Read: %s", articleURL)
+
+		createdTodo, err := addTodo(task)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{
+			"New todo created": createdTodo,
+		})
+	})
+
 	router.POST("/api/todos", func(c *gin.Context) {
 		var requestTodo struct {
 			Task string `json:"task" binding:"required"`
@@ -112,8 +146,8 @@ func main() {
 }
 
 func initDB() {
-	if dbHost == "" {
-		fmt.Println("DB_HOST environment variable not set")
+	if dbHost == "" || dbName == "" || dbUser == "" || dbPass == "" {
+		fmt.Println("Database configuration environment variables must be set")
 		os.Exit(1)
 	}
 
