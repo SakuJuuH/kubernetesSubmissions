@@ -3,3 +3,4 @@
 **/**/node_modules
 **/**/image
 **/docker-compose.yaml
+**/Dockerfile.dev
