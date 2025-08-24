@@ -23,7 +23,7 @@ spec:
             claimName: shared-data-pvc
       containers:
         - name: todo-app-frontend
-          image: sakuheinonen/todo-frontend:2.8.4
+          image: sakuheinonen/todo-frontend:2.10.1
           volumeMounts:
             - name: shared-volume
               mountPath: /usr/src/app/files

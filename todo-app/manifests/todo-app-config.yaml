@@ -10,3 +10,4 @@ data:
   CACHED_IMAGE_NAME: "current_image.jpg"
   IMAGE_DIR: "/usr/src/app/files/image"
   RANDOM_ARTICLE_URL: "https://en.wikipedia.org/wiki/Special:Random"
+  GIN_MODE: "release"

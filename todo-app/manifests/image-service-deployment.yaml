@@ -23,13 +23,18 @@ spec:
             claimName: shared-data-pvc
       containers:
         - name: image-service
-          image: sakuheinonen/image-service:2.8.2
+          image: sakuheinonen/image-service:2.10.3
           volumeMounts:
             - name: shared-volume
               mountPath: /usr/src/app/files
           env:
             - name: PORT
               value: "3000"
+            - name: GIN_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: GIN_MODE
             - name: ALLOWED_ORIGINS
               valueFrom:
                 configMapKeyRef:

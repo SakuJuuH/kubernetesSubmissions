@@ -19,10 +19,15 @@ spec:
     spec:
       containers:
         - name: todo-service
-          image: sakuheinonen/todo-service:2.9.2
+          image: sakuheinonen/todo-service:2.10.3
           env:
             - name: PORT
               value: "3001"
+            - name: GIN_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: GIN_MODE
             - name: ALLOWED_ORIGINS
               valueFrom:
                 configMapKeyRef:
