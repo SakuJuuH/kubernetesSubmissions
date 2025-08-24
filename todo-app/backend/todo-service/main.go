@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"log"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/rs/zerolog/log"
 )
 
 type Todo struct {
@@ -18,149 +16,63 @@ type Todo struct {
 	Done bool   `json:"done" db:"done"`
 }
 
-var (
-	port             = os.Getenv("PORT")
-	allowedOrigins   = os.Getenv("ALLOWED_ORIGINS")
-	dbHost           = os.Getenv("POSTGRES_HOST")
-	dbUser           = os.Getenv("POSTGRES_USER")
-	dbPass           = os.Getenv("POSTGRES_PASSWORD")
-	dbName           = os.Getenv("POSTGRES_DB")
-	db               *sqlx.DB
-	randomArticleURL = os.Getenv("RANDOM_ARTICLE_URL")
-)
-
-func getTodos() ([]Todo, error) {
-	todos := make([]Todo, 0)
-	err := db.Select(&todos, "SELECT id, task, done FROM todos")
-	return todos, err
-}
-
-func addTodo(task string) (Todo, error) {
-	var todo Todo
-	err := db.Get(&todo, "INSERT INTO todos (task) VALUES ($1) RETURNING id, task, done", task)
-	if err != nil {
-		return Todo{}, err
-	}
-	return todo, nil
-}
-
 func main() {
+	var port = os.Getenv("PORT")
+
 	if port == "" {
-		fmt.Println("$PORT must be set")
-		os.Exit(1)
+		log.Fatal().Msg("$PORT must be set")
 	}
 
-	if allowedOrigins == "" {
-		allowedOrigins = "*"
-	}
-
-	initDB()
+	db := initDB()
 	defer func(db *sqlx.DB) {
 		err := db.Close()
 		if err != nil {
-			log.Printf("Error closing database: %v", err)
+			log.Error().Err(err).Msg("Failed to close database connection")
 		}
 	}(db)
 
+	repo := NewTodoRepository(db)
+	controller := NewTodosController(repo)
+
 	router := gin.Default()
 
-	router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", allowedOrigins)
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	router.Use(CorsMiddleware)
 
-		if c.Request.Method == http.MethodOptions {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
+	router.GET("/api/todos", controller.getTodos)
 
-		c.Next()
-	})
+	router.POST("/api/todos", controller.createTodo)
 
-	router.GET("/api/todos", func(c *gin.Context) {
-		todos, err := getTodos()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, todos)
-	})
+	router.POST("/api/todos/random", controller.createRandomTodo)
 
-	router.POST("/api/todos/random", func(c *gin.Context) {
-		if randomArticleURL == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "RANDOM_ARTICLE_URL is not set"})
-			return
-		}
-
-		resp, err := http.Get(randomArticleURL)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		articleURL := resp.Request.URL.String()
-		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-				log.Printf("Error closing response body: %v", err)
-			}
-		}(resp.Body)
-
-		task := fmt.Sprintf("Read: %s", articleURL)
-
-		createdTodo, err := addTodo(task)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusCreated, gin.H{
-			"New todo created": createdTodo,
-		})
-	})
-
-	router.POST("/api/todos", func(c *gin.Context) {
-		var requestTodo struct {
-			Task string `json:"task" binding:"required"`
-		}
-
-		if err := c.BindJSON(&requestTodo); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		newTodo, err := addTodo(requestTodo.Task)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusCreated, newTodo)
-	})
-
-	fmt.Printf("Server starting on port %s\n", port)
+	log.Info().Str("port", port).Msg("Server starting")
 	err := router.Run(":" + port)
 	if err != nil {
-		fmt.Printf("Error starting server: %v\n", err)
-		os.Exit(1)
+		log.Fatal().Err(err).Msg("Failed to start server")
 	}
 }
 
-func initDB() {
+func initDB() *sqlx.DB {
+	var (
+		dbHost = os.Getenv("POSTGRES_HOST")
+		dbUser = os.Getenv("POSTGRES_USER")
+		dbPass = os.Getenv("POSTGRES_PASSWORD")
+		dbName = os.Getenv("POSTGRES_DB")
+	)
+
 	if dbHost == "" || dbName == "" || dbUser == "" || dbPass == "" {
-		fmt.Println("Database configuration environment variables must be set")
-		os.Exit(1)
+		log.Fatal().Msg("All database environment variables not set")
 	}
 
 	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", dbHost, dbUser, dbPass, dbName)
 
 	var err error
-	db, err = sqlx.Connect("postgres", connStr)
+	db, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatal().Err(err).Msg("Failed to connect to database:")
 	}
 
 	if err = db.Ping(); err != nil {
-		log.Fatal("Failed to ping database:", err)
+		log.Fatal().Err(err).Msg("Failed to ping database:")
 	}
 
 	_, err = db.Exec(`
@@ -173,6 +85,8 @@ func initDB() {
 		)
 	`)
 	if err != nil {
-		log.Fatal("Failed to create table:", err)
+		log.Fatal().Err(err).Msg("Failed to create table:")
 	}
+
+	return db
 }
