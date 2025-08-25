@@ -38,6 +38,8 @@ func main() {
 
 	router.Use(CorsMiddleware)
 
+	router.GET("/", controller.welcome)
+
 	router.GET("/api/todos", controller.getTodos)
 
 	router.POST("/api/todos", controller.createTodo)

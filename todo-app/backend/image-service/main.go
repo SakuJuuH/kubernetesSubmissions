@@ -39,6 +39,8 @@ func main() {
 
 	router.Static("/api/image/files", imageDirectory)
 
+	router.GET("/", controller.welcome)
+
 	router.GET("/api/image/current", controller.getImageInfo)
 
 	router.POST("/api/image/shutdown", controller.shutdownServer)

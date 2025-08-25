@@ -16,6 +16,8 @@ spec:
       labels:
         app: postgres-db
     spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
       containers:
         - name: postgres
           image: postgres:15
@@ -56,6 +58,7 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-storage
+              subPath: postgres-data
 
   volumeClaimTemplates:
     - metadata:

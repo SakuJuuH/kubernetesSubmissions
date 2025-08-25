@@ -6,11 +6,19 @@ metadata:
   labels:
     app: random-todo-cronjob
 spec:
+
   schedule: "0 * * * *" # Every hour at minute 0
   jobTemplate:
     spec:
       template:
         spec:
+          tolerations:
+            - key: "kubernetes.io/arch"
+              operator: "Equal"
+              value: "arm64"
+              effect: "NoSchedule"
+          nodeSelector:
+            kubernetes.io/arch: arm64
           containers:
             - name: curl
               image: curlimages/curl:8.4.0

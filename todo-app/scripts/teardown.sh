@@ -2,4 +2,4 @@
 
 set -e
 
-kubectl delete -f ./manifests/ -f ../manifests/ || true
+kubectl delete -k . || true

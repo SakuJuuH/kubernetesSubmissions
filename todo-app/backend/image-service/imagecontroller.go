@@ -22,6 +22,11 @@ func NewImageController(repo ImageRepository) *ImageController {
 	return &ImageController{repo: repo}
 }
 
+func (c *ImageController) welcome(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"message": "Welcome to the image service. " +
+		"Use /api/image/current to get the current image info."})
+}
+
 func (c *ImageController) getImageInfo(ctx *gin.Context) {
 	imageInfo, err := c.repo.GetCachedImage()
 	if err != nil {

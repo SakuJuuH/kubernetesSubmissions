@@ -17,9 +17,11 @@ spec:
       labels:
         app: todo-service
     spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
       containers:
         - name: todo-service
-          image: sakuheinonen/todo-service:2.10.3
+          image: sakuheinonen/todo-service:3.5.1
           env:
             - name: PORT
               value: "3001"
@@ -58,10 +60,3 @@ spec:
                 configMapKeyRef:
                   name: todo-app-config
                   key: RANDOM_ARTICLE_URL
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "50m"
-            limits:
-              memory: "128Mi"
-              cpu: "100m"

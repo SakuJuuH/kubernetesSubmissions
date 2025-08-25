@@ -58,6 +58,13 @@ func (c *TodosController) createTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newTodo)
 }
 
+func (c *TodosController) welcome(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"message":     "Welcome to the Todo API! Use /api/todos to manage your tasks.",
+		"status_code": http.StatusOK,
+	})
+}
+
 func (c *TodosController) createRandomTodo(ctx *gin.Context) {
 	var randomArticleURL = os.Getenv("RANDOM_ARTICLE_URL")
 
