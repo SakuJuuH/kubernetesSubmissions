@@ -16,6 +16,8 @@ kubectl apply -f manifests
 
 ```
 
+or use the `deploy.sh` script.
+
 To access the application, head over to:
 
 
