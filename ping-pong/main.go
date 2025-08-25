@@ -87,6 +87,13 @@ func main() {
 
 	router := gin.Default()
 
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message":     "Welcome to the Ping Pong Service!",
+			"status_code": http.StatusOK,
+		})
+	})
+
 	router.GET("/pingpong", func(c *gin.Context) {
 		count, err := incrementCounter()
 		if err != nil {
@@ -99,7 +106,7 @@ func main() {
 		})
 	})
 
-	router.GET("/pings", func(c *gin.Context) {
+	router.GET("/pingpong/pings", func(c *gin.Context) {
 		count, err := getCount()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count"})

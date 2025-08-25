@@ -31,7 +31,7 @@ func main() {
 	}
 
 	if pingPongURL == "" {
-		pingPongURL = "http://localhost:3001/"
+		pingPongURL = "http://localhost:3001/api"
 	}
 
 	if message == "" {
@@ -49,6 +49,13 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message":     "Welcome to the Log Output Service!",
+			"status_code": http.StatusOK,
+		})
+	})
+
+	router.GET("/log", func(c *gin.Context) {
 		count, err := getPingCount()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -77,7 +84,7 @@ func getPingCount() (int64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("unable to parse PING_PONG_URL: %w", err)
 	}
-	u.Path = "pings"
+	u.Path = "/pingpong/pings"
 
 	resp, err := http.Get(u.String())
 	if err != nil {
