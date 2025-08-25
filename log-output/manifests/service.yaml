@@ -10,5 +10,5 @@ spec:
     - protocol: TCP
       port: 2345
       targetPort: 3030
-  type: NodePort
+  type: ClusterIP
   
