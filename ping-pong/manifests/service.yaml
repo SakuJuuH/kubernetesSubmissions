@@ -11,5 +11,5 @@ spec:
     - protocol: TCP
       port: 3080
       targetPort: 3050
-  type: ClusterIP
+  type: LoadBalancer
   

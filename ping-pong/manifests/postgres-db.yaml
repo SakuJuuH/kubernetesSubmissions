@@ -16,6 +16,8 @@ spec:
       labels:
         app: postgres-db
     spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
       containers:
         - name: postgres
           image: postgres:15
@@ -43,19 +45,13 @@ spec:
                 - postgres
             initialDelaySeconds: 5
             periodSeconds: 5
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
           ports:
             - name: postgres
               containerPort: 5432
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-storage
+              subPath: postgres-data
 
   volumeClaimTemplates:
     - metadata:

@@ -3,15 +3,11 @@ LABEL authors="sakuheinonen"
 
 WORKDIR /app
 
-COPY go.mod go.mod
-COPY go.sum go.sum
-
-# Install necessary packages for building the Go application
+COPY go.mod go.sum ./
 RUN go mod download
 
-COPY main.go main.go
-
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -o main main.go
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
 FROM alpine:latest
 WORKDIR /
