@@ -84,7 +84,7 @@ func getPingCount() (int64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("unable to parse PING_PONG_URL: %w", err)
 	}
-	u.Path = "/pingpong/pings"
+	u.Path = "/pings"
 
 	resp, err := http.Get(u.String())
 	if err != nil {

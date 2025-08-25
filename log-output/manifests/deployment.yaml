@@ -21,7 +21,7 @@ spec:
         kubernetes.io/arch: arm64
       containers:
         - name: log-output
-          image: sakuheinonen/log-output:3.2.1
+          image: sakuheinonen/log-output:3.4.1
           ports:
             - containerPort: 3030
           resources:
@@ -35,7 +35,7 @@ spec:
             - name: PORT
               value: "3030"
             - name: PING_PONG_URL
-              value: "http://ping-pong-svc:3080/pingpong/"
+              value: "http://ping-pong-svc:3080/"
             - name: MESSAGE
               valueFrom:
                 configMapKeyRef:

@@ -94,7 +94,7 @@ func main() {
 		})
 	})
 
-	router.GET("/pingpong", func(c *gin.Context) {
+	router.GET("/ping", func(c *gin.Context) {
 		count, err := incrementCounter()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to increment count"})
@@ -106,7 +106,7 @@ func main() {
 		})
 	})
 
-	router.GET("/pingpong/pings", func(c *gin.Context) {
+	router.GET("/pings", func(c *gin.Context) {
 		count, err := getCount()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count"})
