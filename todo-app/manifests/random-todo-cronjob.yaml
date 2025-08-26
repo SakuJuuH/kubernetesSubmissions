@@ -15,10 +15,10 @@ spec:
           tolerations:
             - key: "kubernetes.io/arch"
               operator: "Equal"
-              value: "arm64"
+              value: "amd64"
               effect: "NoSchedule"
           nodeSelector:
-            kubernetes.io/arch: arm64
+            kubernetes.io/arch: amd64
           containers:
             - name: curl
               image: curlimages/curl:8.4.0
