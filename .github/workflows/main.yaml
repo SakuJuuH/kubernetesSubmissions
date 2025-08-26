@@ -21,9 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug secret length
-        run:
-          echo "Secret length: $(echo '${{ secrets.GKE_SA_KEY }}' | wc -c)"
+      - name: Debug secrets length
+        run: |
+          echo "GKE_SA_KEY length: $(echo '${{ secrets.GKE_SA_KEY }}' | wc -c)"
+          echo "GKE_PROJECT length: $(echo '${{ secrets.GKE_PROJECT }}' | wc -c)"
+        shell: bash
 
       - uses: google-github-actions/auth@v2
         with:
