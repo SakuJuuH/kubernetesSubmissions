@@ -56,7 +56,7 @@ jobs:
                   platforms: linux/arm64
                   context: ./todo-app/frontend
                   push: true
-                  tags: $FRONTEND_IMAGE_TAG
+                  tags: ${{ env.FRONTEND_IMAGE_TAG }}
 
             - name: Build and Push Todo Service Image
               uses: docker/build-push-action@v4
@@ -64,7 +64,7 @@ jobs:
                   platforms: linux/arm64
                   context: ./todo-app/todo-service
                   push: true
-                  tags: $TODO_SERVICE_IMAGE_TAG
+                  tags: ${{ env.TODO_SERVICE_IMAGE_TAG }}
 
             - name: Build and Push Image Service
               uses: docker/build-push-action@v4
@@ -72,7 +72,7 @@ jobs:
                   platforms: linux/arm64
                   context: ./todo-app/image-service
                   push: true
-                  tags: $IMAGE_SERVICE_IMAGE_TAG
+                  tags: ${{ env.IMAGE_SERVICE_IMAGE_TAG }}
 
             - name: Set up Kustomize
               uses: imranismail/setup-kustomize@v2.1.0
