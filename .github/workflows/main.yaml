@@ -25,24 +25,25 @@ jobs:
 
       - uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GKE_SA_KEY }}
+          credentials_json: '${{ secrets.GKE_SA_KEY }}'
 
-      - name: Set up Cloud SDK
+      - name: 'Set up Cloud SDK'
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Use gcloud CLI
+      - name: 'Use gcloud CLI'
         run: gcloud info
 
-      - name: Configure Docker
+      - name: 'Configure Docker'
         run: gcloud auth configure-docker $REGISTRY --quiet
 
-      - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@v2
+      - name: 'Get GKE credentials'
+        uses: 'google-github-actions/get-gke-credentials@v2'
         with:
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GKE_REGION }}
+            cluster_name: '${{ env.GKE_CLUSTER }}'
+            project_id: '${{ env.PROJECT_ID }}'
+            location: '${{ env.GKE_ZONE }}'
 
-      - name: Form the image name
+      - name: 'Form the image name'
         run: echo "IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
 
       - name: Build
