@@ -73,7 +73,7 @@ jobs:
           kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/todo-service=$TODO_SERVICE_IMAGE_TAG
           kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/image-service=$IMAGE_SERVICE_IMAGE_TAG
           kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment todo-app-frontend
-          kubectl rollout status deployment todo-service
-          kubectl rollout status deployment image-service
+          kubectl rollout status deployment todo-app-frontend -n project
+          kubectl rollout status deployment todo-service -n project
+          kubectl rollout status deployment image-service -n project
           kubectl get services -o wide
