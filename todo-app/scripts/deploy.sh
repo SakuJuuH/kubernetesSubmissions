@@ -2,4 +2,4 @@
 
 set -e
 
-kubectl apply -k .
+kubectl apply -k ./manifests
