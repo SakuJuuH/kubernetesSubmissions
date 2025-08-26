@@ -20,7 +20,7 @@ spec:
         app: todo-service
     spec:
       nodeSelector:
-        kubernetes.io/arch: arm64
+        kubernetes.io/arch: amd64
       containers:
         - name: todo-service
           image: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/todo-service

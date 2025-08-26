@@ -1,8 +1,7 @@
 name: main.yaml
 on:
     push:
-        branches:
-            - main
+
 env:
     PROJECT_ID: ${{ secrets.GKE_PROJECT }}
     GKE_CLUSTER: dwk-cluster
@@ -11,9 +10,11 @@ env:
     REGISTRY: europe-west4-docker.pkg.dev
     REPOSITORY: my-repository
     BRANCH: ${{ github.ref_name }}
+    ARCHITECTURE: linux/amd64
     FRONTEND_IMAGE_TAG: europe-west4-docker.pkg.dev/${{ secrets.GKE_PROJECT }}/my-repository/frontend:${{ github.ref_name }}-${{ github.sha }}-${{ github.run_id }}
     TODO_SERVICE_IMAGE_TAG: europe-west4-docker.pkg.dev/${{ secrets.GKE_PROJECT }}/my-repository/todo-service:${{ github.ref_name }}-${{ github.sha }}-${{ github.run_id }}
     IMAGE_SERVICE_IMAGE_TAG: europe-west4-docker.pkg.dev/${{ secrets.GKE_PROJECT }}/my-repository/image-service:${{ github.ref_name }}-${{ github.sha }}-${{ github.run_id }}
+    NAMESPACE: ${{ github.ref_name == 'main' && 'project' || 'github.ref_name' }}
 
 jobs:
     build-publish-deploy:
@@ -48,12 +49,12 @@ jobs:
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v2
               with:
-                  platforms: linux/arm64
+                  platforms: ${{ env.ARCHITECTURE }}
 
             - name: Build and Push Frontend Image
               uses: docker/build-push-action@v4
               with:
-                  platforms: linux/arm64
+                  platforms: ${{ env.ARCHITECTURE }}
                   context: ./todo-app/frontend
                   push: true
                   tags: ${{ env.FRONTEND_IMAGE_TAG }}
@@ -61,7 +62,7 @@ jobs:
             - name: Build and Push Todo Service Image
               uses: docker/build-push-action@v4
               with:
-                  platforms: linux/arm64
+                  platforms: ${{ env.ARCHITECTURE }}
                   context: ./todo-app/backend/todo-service
                   push: true
                   tags: ${{ env.TODO_SERVICE_IMAGE_TAG }}
@@ -69,7 +70,7 @@ jobs:
             - name: Build and Push Image Service
               uses: docker/build-push-action@v4
               with:
-                  platforms: linux/arm64
+                  platforms: ${{ env.ARCHITECTURE }}
                   context: ./todo-app/backend/image-service
                   push: true
                   tags: ${{ env.IMAGE_SERVICE_IMAGE_TAG }}
@@ -80,6 +81,9 @@ jobs:
             - name: Deploy
               run: |-
                   cd todo-app/manifests
+                  kubectl create namespace $NAMESPACE || true
+                  kubectl config set-context --current --namespace=$NAMESPACE
+                  kustomize edit set namespace $NAMESPACE
                   kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/frontend=$FRONTEND_IMAGE_TAG
                   kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/todo-service=$TODO_SERVICE_IMAGE_TAG
                   kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/image-service=$IMAGE_SERVICE_IMAGE_TAG
