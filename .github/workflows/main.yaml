@@ -62,7 +62,7 @@ jobs:
               uses: docker/build-push-action@v4
               with:
                   platforms: linux/arm64
-                  context: ./todo-app/todo-service
+                  context: ./todo-app/backend/todo-service
                   push: true
                   tags: ${{ env.TODO_SERVICE_IMAGE_TAG }}
 
@@ -70,7 +70,7 @@ jobs:
               uses: docker/build-push-action@v4
               with:
                   platforms: linux/arm64
-                  context: ./todo-app/image-service
+                  context: ./todo-app/backend/image-service
                   push: true
                   tags: ${{ env.IMAGE_SERVICE_IMAGE_TAG }}
 
