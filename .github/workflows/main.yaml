@@ -10,12 +10,10 @@ env:
   GKE_ZONE: europe-west4-a
   REGISTRY: europe-west4-docker.pkg.dev
   REPOSITORY: my-repository
-
   BRANCH: ${{ github.ref_name }}
-
-  FRONTEND_IMAGE_TAG: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/frontend:${{ env.BRANCH }}-${{ github.sha }}
-  TODO_SERVICE_IMAGE_TAG: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/todo-service:${{ env.BRANCH }}-${{ github.sha }}
-  IMAGE_SERVICE_IMAGE_TAG: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/image-service:${{ env.BRANCH }}-${{ github.sha }}
+  FRONTEND_IMAGE_TAG: europe-west4-docker.pkg.dev/${{ secrets.GKE_PROJECT }}/my-repository/frontend:${{ github.ref_name }}-${{ github.sha }}
+  TODO_SERVICE_IMAGE_TAG: europe-west4-docker.pkg.dev/${{ secrets.GKE_PROJECT }}/my-repository/todo-service:${{ github.ref_name }}-${{ github.sha }}
+  IMAGE_SERVICE_IMAGE_TAG: europe-west4-docker.pkg.dev/${{ secrets.GKE_PROJECT }}/my-repository/image-service:${{ github.ref_name }}-${{ github.sha }}
 
 jobs:
   build-publish-deploy:
