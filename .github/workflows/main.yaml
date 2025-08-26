@@ -4,7 +4,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: dwk_cluster
+  GKE_CLUSTER: dwk-cluster
   GKE_REGION: europe-west4
   GKE_ZONE: europe-west4-a
   REGISTRY: europe-west4-docker.pkg.dev
