@@ -47,7 +47,7 @@ jobs:
                   location: "${{ env.GKE_ZONE }}"
 
             - name: Build and Push frontend image
-              run: docker build --platform=linux/arm64 -t $FRONTEND_IMAGE_TAG ./todo-app/frontend --push
+              run: docker build --platform=$ARCHITECTURE -t $FRONTEND_IMAGE_TAG ./todo-app/frontend --push
 
             - name: Build and Push todo-service image
               run: docker build --platform=$ARCHITECTURE -t $TODO_SERVICE_IMAGE_TAG ./todo-app/backend/todo-service --push
