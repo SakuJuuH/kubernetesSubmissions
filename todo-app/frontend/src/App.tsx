@@ -139,7 +139,6 @@ function App() {
                 <h1>The Todo App</h1>
                 {imageLoading && <p>Loading image...</p>}
                 {imageError && <p style={{color: 'red'}}>{imageError}</p>}
-
                 {imageInfo && !imageLoading && (
                     <div>
                         <p>Image cached at: {new Date(imageInfo.cached_at).toLocaleString()}</p>
