@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -66,30 +67,44 @@ func (c *TodosController) welcome(ctx *gin.Context) {
 }
 
 func (c *TodosController) createRandomTodo(ctx *gin.Context) {
-	var randomArticleURL = os.Getenv("RANDOM_ARTICLE_URL")
-
+	randomArticleURL := os.Getenv("RANDOM_ARTICLE_URL")
 	if randomArticleURL == "" {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "RANDOM_ARTICLE_URL is not set"})
 		return
 	}
 
-	resp, err := http.Get(randomArticleURL)
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Get(randomArticleURL)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get random article")
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	articleURL := resp.Request.URL.String()
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to close response body")
+			log.Error().Err(err).Msg("Error closing response body")
 		}
 	}(resp.Body)
 
-	task := fmt.Sprintf("Read: %s", articleURL)
+	articleURL := resp.Request.URL.String()
 
+	if articleURL == randomArticleURL {
+		log.Warn().
+			Str("path", ctx.FullPath()).
+			Str("url", articleURL).
+			Msg("random article rejected: same as RANDOM_ARTICLE_URL")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Cannot read the same article twice"})
+		return
+	}
+
+	task := fmt.Sprintf("Read: %s", articleURL)
 	task, ok := validateAndLogTask(ctx, task)
 	if !ok {
 		return
