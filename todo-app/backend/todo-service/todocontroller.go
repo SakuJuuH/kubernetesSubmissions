@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"time"
@@ -75,36 +74,36 @@ func (c *TodosController) createRandomTodo(ctx *gin.Context) {
 
 	client := &http.Client{
 		Timeout: 10 * time.Second,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
 	}
 
-	resp, err := client.Get(randomArticleURL)
+	req, err := http.NewRequest("GET", randomArticleURL, nil)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create request")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get random article")
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Error().Err(err).Msg("Error closing response body")
-		}
-	}(resp.Body)
 
-	articleURL := resp.Request.URL.String()
+	redirectedURL := resp.Request.URL.String()
 
-	if articleURL == randomArticleURL {
+	if redirectedURL == randomArticleURL {
 		log.Warn().
 			Str("path", ctx.FullPath()).
-			Str("url", articleURL).
+			Str("url", redirectedURL).
 			Msg("random article rejected: same as RANDOM_ARTICLE_URL")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Cannot read the same article twice"})
 		return
 	}
 
-	task := fmt.Sprintf("Read: %s", articleURL)
+	task := fmt.Sprintf("Read: %s", redirectedURL)
 	task, ok := validateAndLogTask(ctx, task)
 	if !ok {
 		return
