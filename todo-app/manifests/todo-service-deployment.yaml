@@ -6,6 +6,8 @@ metadata:
     app: todo-service
   namespace: project
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
