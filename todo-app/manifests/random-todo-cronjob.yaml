@@ -26,5 +26,5 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  curl -X POST http://todo-service-svc.project.svc.cluster.local:2346/api/todos/random
+                  curl -X POST -H "User-Agent: Mozilla/5.0 (compatible; TodoAppBot/1.0)" http://todo-service-svc.project.svc.cluster.local:2346/api/todos/random
           restartPolicy: OnFailure
