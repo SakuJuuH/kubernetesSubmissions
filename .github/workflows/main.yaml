@@ -40,7 +40,6 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v2
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
-          project_id: ${{ env.PROJECT_ID }}
           location: ${{ env.GKE_REGION }}
 
       - name: Form the image name
