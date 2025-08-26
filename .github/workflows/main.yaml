@@ -1,7 +1,8 @@
 name: main.yaml
 on:
   push:
-
+    branches:
+      - main
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: dwk-cluster
@@ -9,9 +10,12 @@ env:
   GKE_ZONE: europe-west4-a
   REGISTRY: europe-west4-docker.pkg.dev
   REPOSITORY: my-repository
-  IMAGE: dwk-environments
-  SERVICE: dwk-environments
+
   BRANCH: ${{ github.ref_name }}
+
+  FRONTEND_IMAGE_TAG: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/frontend:${{ env.BRANCH }}-${{ github.sha }}
+  TODO_SERVICE_IMAGE_TAG: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/todo-service:${{ env.BRANCH }}-${{ github.sha }}
+  IMAGE_SERVICE_IMAGE_TAG: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/image-service:${{ env.BRANCH }}-${{ github.sha }}
 
 jobs:
   build-publish-deploy:
@@ -43,14 +47,23 @@ jobs:
             project_id: '${{ env.PROJECT_ID }}'
             location: '${{ env.GKE_ZONE }}'
 
-      - name: 'Form the image name'
-        run: echo "IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Build frontend image
+        run: docker build -t $FRONTEND_IMAGE_TAG ./todo-app/frontend
 
-      - name: Build
-        run: docker build -t $IMAGE_TAG .
+      - name: Push frontend image
+        run: docker push $FRONTEND_IMAGE_TAG
 
-      - name: Publish
-        run: docker push $IMAGE_TAG
+      - name: Build todo-service image
+        run: docker build -t $TODO_SERVICE_IMAGE_TAG ./todo-app/backend/todo-service
+
+      - name: Push todo-service image
+        run: docker push $TODO_SERVICE_IMAGE_TAG
+
+      - name: Build image-service image
+        run: docker build -t $IMAGE_SERVICE_IMAGE_TAG ./todo-app/backend/image-service
+
+      - name: Push image-service image
+        run: docker push $IMAGE_SERVICE_IMAGE_TAG
 
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2.1.0
@@ -58,7 +71,11 @@ jobs:
       - name: Deploy
         run: |-
           cd todo-app/manifests
-          kustomize edit set image PROJECT/IMAGE=$IMAGE_TAG
+          kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/frontend=$FRONTEND_IMAGE_TAG
+          kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/todo-service=$TODO_SERVICE_IMAGE_TAG
+          kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/image-service=$IMAGE_SERVICE_IMAGE_TAG
           kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment $SERVICE
+          kubectl rollout status deployment frontend-deployment
+          kubectl rollout status deployment todo-service-deployment
+          kubectl rollout status deployment image-service-deployment
           kubectl get services -o wide

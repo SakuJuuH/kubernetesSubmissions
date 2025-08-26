@@ -27,7 +27,7 @@ spec:
             claimName: shared-data-pvc
       containers:
         - name: image-service
-          image: sakuheinonen/image-service:3.5.1
+          image: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/image-service
           volumeMounts:
             - name: shared-volume
               mountPath: /usr/src/app/files

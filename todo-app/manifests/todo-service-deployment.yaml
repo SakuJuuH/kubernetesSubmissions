@@ -23,7 +23,7 @@ spec:
         kubernetes.io/arch: arm64
       containers:
         - name: todo-service
-          image: sakuheinonen/todo-service:3.5.1
+          image: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/todo-service
           env:
             - name: PORT
               value: "3001"
