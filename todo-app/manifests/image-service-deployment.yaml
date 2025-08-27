@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: project
   name: image-service
   labels:
     app: image-service
@@ -14,7 +13,6 @@ spec:
       app: image-service
   template:
     metadata:
-      namespace: project
       name: image-service
       labels:
         app: image-service

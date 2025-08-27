@@ -2,7 +2,6 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: random-todo-cronjob
-  namespace: project
   labels:
     app: random-todo-cronjob
 spec:
@@ -26,5 +25,5 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  curl -X POST http://todo-service-svc.project.svc.cluster.local:2346/api/todos/random
+                  curl -X POST http://todo-service-svc:2346/api/todos/random
           restartPolicy: OnFailure
