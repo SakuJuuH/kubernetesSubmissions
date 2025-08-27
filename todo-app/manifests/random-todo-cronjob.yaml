@@ -27,3 +27,10 @@ spec:
                 - |
                   curl -X POST http://todo-service-svc:2346/api/todos/random
           restartPolicy: OnFailure
+          resources:
+            requests:
+              memory: "16Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
