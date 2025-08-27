@@ -57,3 +57,5 @@ spec:
                 items:
                   - key: gcs-credentials.json
                     path: gcs-credentials.json
+
+          restartPolicy: OnFailure
