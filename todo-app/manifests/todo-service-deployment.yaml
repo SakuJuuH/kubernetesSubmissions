@@ -4,7 +4,6 @@ metadata:
   name: todo-service
   labels:
     app: todo-service
-  namespace: project
 spec:
   strategy:
     type: Recreate
@@ -14,7 +13,6 @@ spec:
       app: todo-service
   template:
     metadata:
-      namespace: project
       name: todo-service
       labels:
         app: todo-service
