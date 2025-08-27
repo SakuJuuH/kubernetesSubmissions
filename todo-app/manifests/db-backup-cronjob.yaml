@@ -10,16 +10,9 @@ spec:
       template:
         spec:
           containers:
-            - name: db-backup
-              image: google/cloud-sdk:latest
+            - name: postgres-backup
+              image: postgres:15
               env:
-                - name: GOOGLE_APPLICATION_CREDENTIALS
-                  value: /secrets/gcs-credentials.json
-                - name: BUCKET_NAME
-                  valueFrom:
-                    configMapKeyRef:
-                      name: postgres-config
-                      key: BUCKET_NAME
                 - name: POSTGRES_DB
                   valueFrom:
                     configMapKeyRef:
@@ -35,22 +28,49 @@ spec:
                     configMapKeyRef:
                       name: postgres-config
                       key: POSTGRES_PASSWORD
-              command: [ "/bin/sh", "-c" ]
+              command: ["/bin/sh", "-c"]
               args:
                 - |
-                  BACKUP_FILE="todo-db-backup-$(date +%Y-%m-%d-%H%M%S).sql"
-                  
-                  PGPASSWORD=${POSTGRES_PASSWORD} pg_dump -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h postgres-svc -f /tmp/${BACKUP_FILE}
-                  
-                  gsutil cp /tmp/${BACKUP_FILE} gs://${BUCKET_NAME}/${BACKUP_FILE}
-                  
-                  rm /tmp/${BACKUP_FILE}
+                  BACKUP_FILE="/shared/todo-db-backup-$(date +%Y-%m-%d-%H%M%S).sql"
+                  echo "Starting database dump..."
+                  PGPASSWORD=${POSTGRES_PASSWORD} \
+                    pg_dump -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h postgres-svc -f "${BACKUP_FILE}"
+                  echo "Backup complete: ${BACKUP_FILE}"
               volumeMounts:
+                - name: backup-volume
+                  mountPath: /shared
+
+            - name: gcloud-upload
+              image: google/cloud-sdk:latest
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /secrets/gcs-credentials.json
+                - name: BUCKET_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: postgres-config
+                      key: BUCKET_NAME
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  echo "Waiting for backup file..."
+                  while [ -z "$(ls -A /shared/todo-db-backup-*.sql 2>/dev/null)" ]; do
+                    sleep 5
+                  done
+                  LATEST_BACKUP=$(ls -t /shared/todo-db-backup-*.sql | head -n 1)
+                  echo "Found backup: $LATEST_BACKUP"
+                  gsutil cp "$LATEST_BACKUP" gs://${BUCKET_NAME}/
+                  echo "Upload complete"
+              volumeMounts:
+                - name: backup-volume
+                  mountPath: /shared
                 - name: gcs-credentials-volume
                   mountPath: /secrets
                   readOnly: true
 
           volumes:
+            - name: backup-volume
+              emptyDir: {}
             - name: gcs-credentials-volume
               secret:
                 secretName: gcs-credentials
