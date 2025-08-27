@@ -24,10 +24,10 @@
 - [2.2](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.2/todo-app)
 - [2.3](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.3/)
 - [2.4](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.4/)
-- [2.5](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.5/log-output) 
+- [2.5](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.5/log-output)
 - [2.6](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.6/todo-app)
 - [2.7](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.7/ping-pong)
-- [2.8](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.8/todo-app) 
+- [2.8](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.8/todo-app)
 - [2.9](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.9/todo-app)
 - [2.10](https://github.com/SakuJuuH/kubernetesSubmissions/tree/2.10/todo-app)
 
@@ -39,3 +39,4 @@
 - [3.4](https://github.com/SakuJuuH/kubernetesSubmissions/tree/3.4/log-output)
 - [3.5](https://github.com/SakuJuuH/kubernetesSubmissions/tree/3.5/todo-app)
 - [3.6](https://github.com/SakuJuuH/kubernetesSubmissions/tree/3.6/todo-app)
+- [3.7](https://github.com/SakuJuuH/kubernetesSubmissions/tree/3.7/todo-app)
