@@ -102,6 +102,7 @@ jobs:
                   fi
                   kubectl create namespace $NAMESPACE || true
                   kubectl config set-context --current --namespace=$NAMESPACE
+                  kubectl delete pvc shared-data-pvc --ignore-not-found -n $NAMESPACE
                   kustomize edit set namespace $NAMESPACE
                   kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/frontend=$FRONTEND_IMAGE_TAG
                   kustomize edit set image europe-west4-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/todo-service=$TODO_SERVICE_IMAGE_TAG
