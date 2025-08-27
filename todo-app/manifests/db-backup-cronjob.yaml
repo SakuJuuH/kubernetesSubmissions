@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  namespace: project
+  name: todo-db-backup
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: db-backup
+              image: google/cloud-sdk:latest
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /secrets/gcs-credentials.json
+                - name: BUCKET_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: postgres-config
+                      key: BUCKET_NAME
+                - name: POSTGRES_DB
+                  valueFrom:
+                    configMapKeyRef:
+                      name: postgres-config
+                      key: POSTGRES_DB
+                - name: POSTGRES_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      name: postgres-config
+                      key: POSTGRES_USER
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    configMapKeyRef:
+                      name: postgres-config
+                      key: POSTGRES_PASSWORD
+              command: [ "/bin/sh", "-c" ]
+              args:
+                - |
+                  BACKUP_FILE="todo-db-backup-$(date +%Y-%m-%d-%H%M%S).sql"
+                  
+                  PGPASSWORD=${POSTGRES_PASSWORD} pg_dump -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h postgres-svc -f /tmp/${BACKUP_FILE}
+                  
+                  gsutil cp /tmp/${BACKUP_FILE} gs://${BUCKET_NAME}/${BACKUP_FILE}
+                  
+                  rm /tmp/${BACKUP_FILE}
+              volumeMounts:
+                - name: gcs-credentials-volume
+                  mountPath: /secrets
+                  readOnly: true
+
+          volumes:
+            - name: gcs-credentials-volume
+              secret:
+                secretName: gcs-credentials
+                items:
+                  - key: gcs-credentials.json
+                    path: gcs-credentials.json

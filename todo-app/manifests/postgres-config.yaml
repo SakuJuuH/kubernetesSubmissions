@@ -7,4 +7,5 @@ data:
   POSTGRES_DB: "todo-app"
   POSTGRES_USER: "postgres"
   POSTGRES_PASSWORD: "password"
+  BUCKET_NAME: "dwk-todo-bucket"
 

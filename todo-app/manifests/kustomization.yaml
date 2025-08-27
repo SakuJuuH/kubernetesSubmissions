@@ -11,6 +11,7 @@ resources:
   - ../manifests/postgres-db.yaml
   - ../manifests/postgres-service.yaml
   - ../manifests/random-todo-cronjob.yaml
+  - ../manifests/db-backup-cronjob.yaml
   - ../manifests/route.yaml
   - ../manifests/todo-app-config.yaml
   - ../manifests/todo-service-deployment.yaml
