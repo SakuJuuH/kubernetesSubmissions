@@ -52,7 +52,7 @@ spec:
                 - sh
                 - -c
                 - "curl -sf http://ping-pong-svc:3080/pings"
-            initialDelaySeconds: 8
+            initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 2
             failureThreshold: 2
