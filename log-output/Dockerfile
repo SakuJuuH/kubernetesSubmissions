@@ -3,16 +3,16 @@ LABEL authors="sakuheinonen"
 
 WORKDIR /app
 
-COPY go.mod go.mod
-COPY go.sum go.sum
+COPY go.mod go.sum ./
 
 RUN go mod download
 
 COPY main.go main.go
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags reader -a -o main main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
 
 FROM alpine:latest
+RUN apk add --no-cache curl
 WORKDIR /
 COPY --from=builder /app/main .
 

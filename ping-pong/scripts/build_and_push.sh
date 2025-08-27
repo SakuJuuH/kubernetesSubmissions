@@ -10,5 +10,5 @@ fi
 TAG=$1
 IMAGE_NAME="sakuheinonen/$(basename $(pwd))"
 
-docker build -t ${IMAGE_NAME}:${TAG} .
+docker build --platform=linux/amd64 -t ${IMAGE_NAME}:${TAG} .
 docker push ${IMAGE_NAME}:${TAG}

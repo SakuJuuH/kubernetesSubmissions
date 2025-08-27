@@ -2,4 +2,4 @@
 
 set -e
 
-kubectl delete -f ./manifests/ -f ../ping-pong/manifests/ || true
+kubectl delete -k ./manifests || true

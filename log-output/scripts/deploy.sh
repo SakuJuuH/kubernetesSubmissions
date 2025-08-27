@@ -2,4 +2,4 @@
 
 set -e
 
-kubectl apply -f ./manifests/ -f ../ping-pong/manifests/
+kubectl apply -k ./manifests

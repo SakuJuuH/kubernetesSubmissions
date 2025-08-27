@@ -18,10 +18,10 @@ spec:
         app: log-output
     spec:
       nodeSelector:
-        kubernetes.io/arch: arm64
+        kubernetes.io/arch: amd64
       containers:
         - name: log-output
-          image: sakuheinonen/log-output:3.4.1
+          image: sakuheinonen/log-output:4.1.4
           ports:
             - containerPort: 3030
           resources:
@@ -45,6 +45,18 @@ spec:
           - name: config-volume
             mountPath: /usr/src/app/files
             readOnly: true
+
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "curl -sf http://ping-pong-svc:3080/pings"
+            initialDelaySeconds: 8
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+
       volumes:
         - name: config-volume
           configMap:
@@ -52,3 +64,5 @@ spec:
             items:
               - key: information.txt
                 path: information.txt
+
+

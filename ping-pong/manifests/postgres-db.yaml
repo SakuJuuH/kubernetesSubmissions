@@ -17,7 +17,7 @@ spec:
         app: postgres-db
     spec:
       nodeSelector:
-        kubernetes.io/arch: arm64
+        kubernetes.io/arch: amd64
       containers:
         - name: postgres
           image: postgres:15
@@ -37,14 +37,6 @@ spec:
                 configMapKeyRef:
                   name: postgres-config
                   key: POSTGRES_PASSWORD
-          readinessProbe:
-            exec:
-              command:
-                - pg_isready
-                - -U
-                - postgres
-            initialDelaySeconds: 5
-            periodSeconds: 5
           ports:
             - name: postgres
               containerPort: 5432

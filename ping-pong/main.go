@@ -118,6 +118,14 @@ func main() {
 		})
 	})
 
+	router.GET("/db-health", func(c *gin.Context) {
+		if err := db.Ping(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database is not reachable"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Database is reachable"})
+	})
+
 	err := router.Run(":" + port)
 
 	if err != nil {
