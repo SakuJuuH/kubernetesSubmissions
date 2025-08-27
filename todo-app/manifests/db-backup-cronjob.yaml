@@ -53,12 +53,14 @@ spec:
               command: ["/bin/sh", "-c"]
               args:
                 - |
-                  echo "Waiting for backup file..."
+                  gcloud auth activate-service-account --key-file=/secrets/gcs-credentials.json >/dev/null 2>&1
+                  
                   while [ -z "$(ls -A /shared/todo-db-backup-*.sql 2>/dev/null)" ]; do
                     sleep 5
                   done
+                  
                   LATEST_BACKUP=$(ls -t /shared/todo-db-backup-*.sql | head -n 1)
-                  echo "Found backup: $LATEST_BACKUP"
+                  echo "Uploading $LATEST_BACKUP to bucket ${BUCKET_NAME}..."
                   gsutil cp "$LATEST_BACKUP" gs://${BUCKET_NAME}/
                   echo "Upload complete"
               volumeMounts:
