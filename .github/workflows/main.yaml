@@ -1,7 +1,11 @@
 name: main.yaml
 on:
-    push:
+  push:
+    branches:
+        - '**'
 
+  release:
+    types: [published]
 
 env:
     PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -19,6 +23,7 @@ env:
 
 jobs:
     build-publish-deploy:
+        if: github.event_name != 'release'
         name: Build, Publish and Deploy
         runs-on: ubuntu-latest
         environment: development
