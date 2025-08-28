@@ -53,3 +53,4 @@
 - [4.3](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.3/) `Exercise answer: sum(kube_pod_info{namespace="prometheus",created_by_kind="StatefulSet"}`
 - [4.4](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.4/ping-pong)
 - [4.5](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.5/todo-app)
+- [4.6](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.6/todo-app)
