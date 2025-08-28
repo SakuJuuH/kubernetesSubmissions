@@ -3,5 +3,4 @@ kind: Kustomization
 resources:
   - frontend-deployment.yaml
   - image-service-deployment.yaml
-  - postgres-db.yaml
   - todo-service-deployment.yaml
