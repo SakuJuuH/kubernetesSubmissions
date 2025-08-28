@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -10,8 +9,6 @@ import (
 	discordwebhook "github.com/bensch777/discord-webhook-golang"
 	"github.com/nats-io/nats.go"
 
-	secretmanager "cloud.google.com/go/secretmanager/apiv1"
-	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 	"github.com/rs/zerolog/log"
 )
 
@@ -22,7 +19,7 @@ type Todo struct {
 }
 
 func main() {
-	webhookURL := getDiscordWebhookURL()
+	webhookURL := os.Getenv("DISCORD_WEBHOOK_URL")
 	if webhookURL == "" {
 		log.Error().Msg("DISCORD_WEBHOOK_URL is not set")
 		return
@@ -67,32 +64,6 @@ func main() {
 	}
 
 	select {}
-}
-
-func getDiscordWebhookURL() string {
-	ctx := context.Background()
-	client, err := secretmanager.NewClient(ctx)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to create Secret Manager client")
-		return ""
-	}
-	defer func(client *secretmanager.Client) {
-		err := client.Close()
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to close Secret Manager client")
-		}
-	}(client)
-
-	secretName := "projects/dauntless-glow-470207-m2/secrets/discord-webhook/versions/latest"
-	req := &secretmanagerpb.AccessSecretVersionRequest{Name: secretName}
-
-	result, err := client.AccessSecretVersion(ctx, req)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to access secret version")
-		return ""
-	}
-
-	return string(result.Payload.Data)
 }
 
 func sendDiscordEmbed(webhookURL string, title string, todo Todo) {
