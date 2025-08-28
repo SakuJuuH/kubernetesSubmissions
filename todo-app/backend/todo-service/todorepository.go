@@ -6,6 +6,7 @@ type TodoRepository interface {
 	GetTodos() ([]Todo, error)
 	AddTodo(task string) (Todo, error)
 	healthCheck() (bool, error)
+	markTodoDone(id int) (Todo, error)
 }
 
 type todoRepository struct {
@@ -33,5 +34,11 @@ func (t todoRepository) GetTodos() ([]Todo, error) {
 func (t todoRepository) AddTodo(task string) (Todo, error) {
 	var todo Todo
 	err := t.db.Get(&todo, "INSERT INTO todos (task) VALUES ($1) RETURNING id, task, done", task)
+	return todo, err
+}
+
+func (t todoRepository) markTodoDone(id int) (Todo, error) {
+	var todo Todo
+	err := t.db.Get(&todo, "UPDATE todos SET done = TRUE WHERE id = $1 RETURNING id, task, done", id)
 	return todo, err
 }

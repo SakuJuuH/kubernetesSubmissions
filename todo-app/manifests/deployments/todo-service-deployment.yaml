@@ -47,15 +47,15 @@ spec:
                   key: POSTGRES_DB
             - name: POSTGRES_USER
               valueFrom:
-                  configMapKeyRef:
-                      name: postgres-config
-                      key: POSTGRES_USER
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 configMapKeyRef:
                   name: postgres-config
                   key: POSTGRES_PASSWORD
-            - name : RANDOM_ARTICLE_URL
+            - name: RANDOM_ARTICLE_URL
               valueFrom:
                 configMapKeyRef:
                   name: todo-app-config
@@ -76,7 +76,7 @@ spec:
             failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /api/todos/db-health
+              path: /api/todos/healthz
               port: 3001
             initialDelaySeconds: 20
             periodSeconds: 10

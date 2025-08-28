@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -91,6 +92,20 @@ func (c *TodosController) createRandomTodo(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	defer func() {
+		if resp.Body != nil {
+			resp.Body.Close()
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Error().
+			Int("status_code", resp.StatusCode).
+			Str("url", randomArticleURL).
+			Msg("Failed to fetch random article")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch random article"})
+		return
+	}
 
 	redirectedURL := resp.Request.URL.String()
 
@@ -121,6 +136,41 @@ func (c *TodosController) createRandomTodo(ctx *gin.Context) {
 	})
 }
 
+func (c *TodosController) markTodoDone(ctx *gin.Context) {
+	idParam := ctx.Param("id")
+	if idParam == "" {
+		log.Warn().
+			Str("path", ctx.FullPath()).
+			Msg("mark todo done failed: missing id parameter")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing id parameter"})
+		return
+	}
+
+	idParamInt, err := strconv.Atoi(idParam)
+	if err != nil {
+		log.Warn().
+			Str("path", ctx.FullPath()).
+			Msg("mark todo done failed: invalid id parameter")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id parameter"})
+		return
+	}
+
+	var todo Todo
+	todo, err = c.repo.markTodoDone(idParamInt)
+	if err != nil {
+		log.Error().Err(err).Msg("mark todo done failed")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Info().
+		Str("path", ctx.FullPath()).
+		Str("id", idParam).
+		Msg("Todo marked as done")
+
+	ctx.JSON(http.StatusOK, gin.H{"Todo updated": todo})
+}
+
 func (c *TodosController) healthCheck(ctx *gin.Context) {
 	health, err := c.repo.healthCheck()
 	if err != nil {
@@ -130,6 +180,7 @@ func (c *TodosController) healthCheck(ctx *gin.Context) {
 	}
 	if !health {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Database is not reachable"})
+		return
 	}
 	msg := "Database is reachable"
 	log.Info().Msg(msg)

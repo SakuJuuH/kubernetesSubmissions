@@ -18,8 +18,8 @@ type Todo struct {
 }
 
 const (
-	maxRetries    = 10
-	retryInterval = 5 * time.Second
+	maxRetries    int           = 10
+	retryInterval time.Duration = 5 * time.Second
 )
 
 func main() {
@@ -44,14 +44,13 @@ func main() {
 
 	router.Use(CorsMiddleware)
 
+	router.GET("/healthz", func(c *gin.Context) { c.Status(200) })
+
 	router.GET("/", controller.welcome)
-
 	router.GET("/api/todos", controller.getTodos)
-
 	router.POST("/api/todos", controller.createTodo)
-
+	router.PUT("/api/todos/:id", controller.markTodoDone)
 	router.POST("/api/todos/random", controller.createRandomTodo)
-
 	router.GET("/api/todos/db-health", controller.healthCheck)
 
 	log.Info().Str("port", port).Msg("Server starting")
@@ -78,7 +77,7 @@ func initDB() *sqlx.DB {
 
 	var err error
 	var db *sqlx.DB
-	for i := 0; i < maxRetries; i++ {
+	for i := range maxRetries {
 		db, err = sqlx.Connect("postgres", connStr)
 		if err == nil && db.Ping() == nil {
 			break

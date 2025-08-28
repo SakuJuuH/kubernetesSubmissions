@@ -133,6 +133,21 @@ function App() {
         }
     };
 
+    const handleCompleteTodo = async (id: number) => {
+        try {
+            await axios.put(`${todoServiceUrl}/${id}`);
+            
+            let prevTodos = todos || [];
+            let updatedTodos = prevTodos.map(todo => 
+                todo.id === id ? { ...todo, done: true } : todo
+            );
+            setTodos(updatedTodos);
+        } catch (error) {
+            console.error('Error completing todo:', error);
+            alert('Failed to complete todo item.');
+        }
+    };
+
     return (
         <>
             <div>
@@ -167,17 +182,37 @@ function App() {
                 {todos && !todosLoading && (
                     <div className="todo-list">
                         {
-                            todos.length > 0 ? (
-                                todos.sort((a, b) => a.id - b.id).map((todo) => (
-                                    <div key={todo.id} className="todo-item">
-                                        {todo.id}. {todo.task}
-                                    </div>
-                                ))
+                            todos.some(todo => !todo.done) ? (
+                                <>
+                                    <hr style={{margin: '20px 0'}} />
+                                    <h3>Uncompleted Todos</h3>
+                                    {
+                                        todos.sort((a, b) => a.id - b.id).filter(todo => !todo.done ).map((todo) => (
+                                            <div key={todo.id} className="todo-item">
+                                                {todo.id}. {todo.task} <button className='todo-button' onClick={() => handleCompleteTodo(todo.id)}>Mark as Complete</button>
+                                            </div>
+                                        ))
+                                    }
+                                </>
                             ) : (
-                                <p>No todos available</p>
+                                <p>No pending todos. Add a new todo!</p>
                             )
                         }
+                        {todos.some(todo => todo.done) && (
+                            <>
+                                <hr style={{margin: '20px 0'}} />
+                                <h3>Completed Todos</h3>
+                                {
+                                    todos.sort((a, b) => a.id - b.id).filter(todo => todo.done ).map((todo) => (
+                                        <div key={todo.id} className="todo-item completed">
+                                            {todo.id}. {todo.task}
+                                        </div>
+                                    ))
+                                }
+                            </>
+                        )}
                     </div>
+                            
                 )}
                 <div style={{marginTop: '20px'}}>
                     <button onClick={handleShutdown}>
