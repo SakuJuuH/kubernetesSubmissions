@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -92,11 +93,12 @@ func (c *TodosController) createRandomTodo(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	defer func() {
-		if resp.Body != nil {
-			resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Error().Err(err).Msg("Error closing response body")
 		}
-	}()
+	}(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		log.Error().
@@ -171,8 +173,8 @@ func (c *TodosController) markTodoDone(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"Todo updated": todo})
 }
 
-func (c *TodosController) healthCheck(ctx *gin.Context) {
-	health, err := c.repo.healthCheck()
+func (c *TodosController) dbHealthCheck(ctx *gin.Context) {
+	health, err := c.repo.dbHealthCheck()
 	if err != nil {
 		log.Error().Err(err).Msg("Database health check failed")
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Database is not reachable"})
@@ -185,6 +187,10 @@ func (c *TodosController) healthCheck(ctx *gin.Context) {
 	msg := "Database is reachable"
 	log.Info().Msg(msg)
 	ctx.JSON(http.StatusOK, gin.H{"message": msg})
+}
+
+func (c *TodosController) healthCheck(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"message": "Service is healthy"})
 }
 
 func validateAndLogTask(ctx *gin.Context, task string) (string, bool) {

@@ -5,7 +5,7 @@ import "github.com/jmoiron/sqlx"
 type TodoRepository interface {
 	GetTodos() ([]Todo, error)
 	AddTodo(task string) (Todo, error)
-	healthCheck() (bool, error)
+	dbHealthCheck() (bool, error)
 	markTodoDone(id int) (Todo, error)
 }
 
@@ -13,7 +13,7 @@ type todoRepository struct {
 	db *sqlx.DB
 }
 
-func (t todoRepository) healthCheck() (bool, error) {
+func (t todoRepository) dbHealthCheck() (bool, error) {
 	err := t.db.Ping()
 	if err != nil {
 		return false, err
