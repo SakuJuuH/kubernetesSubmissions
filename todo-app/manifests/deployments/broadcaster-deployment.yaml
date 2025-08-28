@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: discord-bot
+  name: broadcaster-service
   labels:
-    app: discord-bot
+    app: broadcaster-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: discord-bot
+      app: broadcaster-service
   template:
     metadata:
       labels:
-        app: discord-bot
+        app: broadcaster-service
     spec:
       serviceAccountName: discord-bot-sa
       containers:
-        - name: discord-bot
+        - name: broadcaster-service
           image: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
           env:
             - name: NATS_URL
