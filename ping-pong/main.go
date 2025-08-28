@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -20,6 +21,11 @@ var (
 	db     *sql.DB
 )
 
+const (
+	maxRetries    = 10
+	retryInterval = 5 * time.Second
+)
+
 func initDB() {
 	if dbHost == "" {
 		fmt.Println("DB_HOST environment variable not set")
@@ -29,13 +35,16 @@ func initDB() {
 	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", dbHost, dbUser, dbPass, dbName)
 
 	var err error
-	db, err = sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+	for i := 0; i < maxRetries; i++ {
+		db, err = sql.Open("postgres", connStr)
+		if err == nil && db.Ping() == nil {
+			break
+		}
+		log.Printf("Failed to connect or ping database (attempt %d/%d): %v\n", i+1, maxRetries, err)
+		time.Sleep(retryInterval)
 	}
-
-	if err = db.Ping(); err != nil {
-		log.Fatal("Failed to ping database:", err)
+	if err != nil || db.Ping() != nil {
+		log.Fatal("Failed to connect to database after retries:", err)
 	}
 
 	// Create table if not exists
