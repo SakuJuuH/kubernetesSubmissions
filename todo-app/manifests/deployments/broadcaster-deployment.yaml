@@ -16,7 +16,7 @@ spec:
     spec:
       serviceAccountName: discord-bot-sa
       containers:
-        - name: broadcaster-service
+        - name: discord-bot
           image: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
           env:
             - name: NATS_URL
