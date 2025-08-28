@@ -37,7 +37,7 @@ func main() {
 	}
 	defer nc.Close()
 
-	if _, err := nc.Subscribe("todo.created", func(m *nats.Msg) {
+	if _, err := nc.QueueSubscribe("todo.created", "broadcaster", func(m *nats.Msg) {
 		var todo Todo
 		if err := json.Unmarshal(m.Data, &todo); err != nil {
 			log.Error().Err(err).Msg("Failed to unmarshal todo.created message")
@@ -50,7 +50,7 @@ func main() {
 		return
 	}
 
-	if _, err := nc.Subscribe("todo.updated", func(m *nats.Msg) {
+	if _, err := nc.QueueSubscribe("todo.updated", "broadcaster", func(m *nats.Msg) {
 		var todo Todo
 		if err := json.Unmarshal(m.Data, &todo); err != nil {
 			log.Error().Err(err).Msg("Failed to unmarshal todo.updated message")
