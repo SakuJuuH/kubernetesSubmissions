@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -247,17 +248,13 @@ func (c *TodosController) sendNatsMessage(subject string, todo Todo) {
 	}
 	defer nc.Close()
 
-	var msg string
-	if subject == "todo.updated" {
-		msg = fmt.Sprintf("Todo with ID %d marked as done: %v", todo.ID, todo)
-	} else if subject == "todo.created" {
-		msg = fmt.Sprintf("New Todo with ID %d created: %v", todo.ID, todo)
-	} else {
-		log.Warn().Msg("Invalid subject, skipping NATS message sending")
+	data, err := json.Marshal(todo)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to marshal todo for NATS message")
 		return
 	}
 
-	if err := nc.Publish(subject, []byte(msg)); err != nil {
+	if err := nc.Publish(subject, data); err != nil {
 		log.Error().Err(err).Msg("Failed to publish NATS message")
 		return
 	}
