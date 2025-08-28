@@ -26,6 +26,13 @@ spec:
                 - -c
                 - |
                   curl -X POST http://todo-service-svc:2346/api/todos/random
+              readinessProbe:
+                httpGet:
+                  path: /api/todos/db-health
+                  port: 3001
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                failureThreshold: 3
           restartPolicy: OnFailure
           resources:
             requests:

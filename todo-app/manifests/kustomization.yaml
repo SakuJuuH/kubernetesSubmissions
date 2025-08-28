@@ -2,17 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../../base-manifests/
-  - frontend-service.yaml
-  - frontend-deployment.yaml
-  - gateway.yaml
-  - image-service-deployment.yaml
-  - image-service-service.yaml
-  - postgres-config.yaml
-  - postgres-db.yaml
-  - postgres-service.yaml
-  - random-todo-cronjob.yaml
-  - db-backup-cronjob.yaml
-  - route.yaml
-  - todo-app-config.yaml
-  - todo-service-deployment.yaml
-  - todo-service-service.yaml
+  - deployments
+  - services
+  - configmaps
+  - cronjobs
+  - gateway

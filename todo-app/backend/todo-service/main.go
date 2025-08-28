@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -15,6 +16,11 @@ type Todo struct {
 	Task string `json:"task" db:"task"`
 	Done bool   `json:"done" db:"done"`
 }
+
+const (
+	maxRetries    = 10
+	retryInterval = 5 * time.Second
+)
 
 func main() {
 	var port = os.Getenv("PORT")
@@ -46,6 +52,8 @@ func main() {
 
 	router.POST("/api/todos/random", controller.createRandomTodo)
 
+	router.GET("/api/todos/db-health", controller.healthCheck)
+
 	log.Info().Str("port", port).Msg("Server starting")
 	err := router.Run(":" + port)
 	if err != nil {
@@ -68,13 +76,17 @@ func initDB() *sqlx.DB {
 	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", dbHost, dbUser, dbPass, dbName)
 
 	var err error
-	db, err := sqlx.Connect("postgres", connStr)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to database:")
+	var db *sqlx.DB
+	for i := 0; i < maxRetries; i++ {
+		db, err = sqlx.Connect("postgres", connStr)
+		if err == nil && db.Ping() == nil {
+			break
+		}
+		log.Warn().Err(err).Msgf("Failed to connect or ping database (attempt %d/%d)", i+1, maxRetries)
+		time.Sleep(retryInterval)
 	}
-
-	if err = db.Ping(); err != nil {
-		log.Fatal().Err(err).Msg("Failed to ping database:")
+	if err != nil || db.Ping() != nil {
+		log.Fatal().Err(err).Msgf("Failed to connect to database after retries: %v", err)
 	}
 
 	_, err = db.Exec(`

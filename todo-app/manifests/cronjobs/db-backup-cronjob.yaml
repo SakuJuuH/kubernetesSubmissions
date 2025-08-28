@@ -39,6 +39,14 @@ spec:
               volumeMounts:
                 - name: backup-volume
                   mountPath: /shared
+              readinessProbe:
+                exec:
+                  command:
+                    - pg_isready
+                    - -U
+                    - postgres
+                initialDelaySeconds: 5
+                periodSeconds: 5
 
             - name: gcloud-upload
               image: google/cloud-sdk:latest
@@ -69,6 +77,14 @@ spec:
                 - name: gcs-credentials-volume
                   mountPath: /secrets
                   readOnly: true
+              readinessProbe:
+                exec:
+                  command:
+                    - gsutil
+                    - ls
+                    - gs://${BUCKET_NAME}/
+                initialDelaySeconds: 5
+                periodSeconds: 5
           resources:
             requests:
               memory: "64Mi"

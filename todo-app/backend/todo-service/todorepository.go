@@ -5,10 +5,19 @@ import "github.com/jmoiron/sqlx"
 type TodoRepository interface {
 	GetTodos() ([]Todo, error)
 	AddTodo(task string) (Todo, error)
+	healthCheck() (bool, error)
 }
 
 type todoRepository struct {
 	db *sqlx.DB
+}
+
+func (t todoRepository) healthCheck() (bool, error) {
+	err := t.db.Ping()
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func NewTodoRepository(db *sqlx.DB) TodoRepository {

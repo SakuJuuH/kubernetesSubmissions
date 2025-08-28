@@ -67,3 +67,17 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "100m"
+          readinessProbe:
+            httpGet:
+              path: /api/todos/db-health
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/todos/db-health
+              port: 3001
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3

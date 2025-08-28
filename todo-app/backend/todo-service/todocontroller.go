@@ -121,6 +121,21 @@ func (c *TodosController) createRandomTodo(ctx *gin.Context) {
 	})
 }
 
+func (c *TodosController) healthCheck(ctx *gin.Context) {
+	health, err := c.repo.healthCheck()
+	if err != nil {
+		log.Error().Err(err).Msg("Database health check failed")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Database is not reachable"})
+		return
+	}
+	if !health {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Database is not reachable"})
+	}
+	msg := "Database is reachable"
+	log.Info().Msg(msg)
+	ctx.JSON(http.StatusOK, gin.H{"message": msg})
+}
+
 func validateAndLogTask(ctx *gin.Context, task string) (string, bool) {
 	const maxLen = 140
 	length := len(task)
