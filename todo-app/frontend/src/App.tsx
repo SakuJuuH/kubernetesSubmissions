@@ -180,40 +180,29 @@ function App() {
                 {todosLoading && <p>Loading todos...</p>}
                 {todosError && <p style={{color: 'red'}}>{todosError}</p>}
                 {todos && !todosLoading && (
-                    <div className="todo-list">
-                        {
-                            todos.some(todo => !todo.done) ? (
-                                <>
-                                    <hr style={{margin: '20px 0'}} />
-                                    <h3>Uncompleted Todos</h3>
-                                    {
-                                        todos.sort((a, b) => a.id - b.id).filter(todo => !todo.done ).map((todo) => (
-                                            <div key={todo.id} className="todo-item">
-                                                {todo.id}. {todo.task} <button className='todo-button' onClick={() => handleCompleteTodo(todo.id)}>Mark as Complete</button>
-                                            </div>
-                                        ))
-                                    }
-                                </>
-                            ) : (
-                                <p>No pending todos. Add a new todo!</p>
-                            )
-                        }
-                        {todos.some(todo => todo.done) && (
-                            <>
-                                <hr style={{margin: '20px 0'}} />
-                                <h3>Completed Todos</h3>
-                                {
-                                    todos.sort((a, b) => a.id - b.id).filter(todo => todo.done ).map((todo) => (
-                                        <div key={todo.id} className="todo-item completed">
-                                            {todo.id}. {todo.task}
-                                        </div>
-                                    ))
-                                }
-                            </>
-                        )}
+                    <div className="todo-lists-container">
+                        <div className="todo-list uncompleted-list">
+                        <h3>Uncompleted Todos</h3>
+                        {todos.sort((a, b) => a.id - b.id).filter(todo => !todo.done ).map((todo) => (
+                            <div key={todo.id} className="todo-item">
+                            {todo.id}. {todo.task}
+                            <button className='todo-button' onClick={() => handleCompleteTodo(todo.id)}>
+                                ✓
+                            </button>
+                            </div>
+                        ))}
+                        {todos.every(todo => todo.done) && <p>No pending todos. Add a new todo!</p>}
+                        </div>
+                        <div className="todo-list completed-list">
+                        <h3>Completed Todos</h3>
+                        {todos.sort((a, b) => a.id - b.id).filter(todo => todo.done ).map((todo) => (
+                            <div key={todo.id} className="todo-item completed">
+                            {todo.id}. {todo.task}
+                            </div>
+                        ))}
+                        </div>
                     </div>
-                            
-                )}
+                    )}
                 <div style={{marginTop: '20px'}}>
                     <button onClick={handleShutdown}>
                         Shutdown Server (for testing)
