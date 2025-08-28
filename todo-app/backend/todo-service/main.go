@@ -73,8 +73,8 @@ func initDB() *sqlx.DB {
 		log.Fatal().Msg("All database environment variables not set")
 	}
 
-	connStr := fmt.Sprintf("host=%s port=5431 user=%s password=%s dbname=%s sslmode=disable", dbHost, dbUser, dbPass,
-		dbName)
+	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable",
+		dbHost, dbUser, dbPass, dbName)
 
 	var err error
 	var db *sqlx.DB
