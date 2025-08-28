@@ -6,7 +6,7 @@ metadata:
     app: todo-service
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
   replicas: 1
   selector:
     matchLabels:
