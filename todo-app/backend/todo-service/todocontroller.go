@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nats-io/nats.go"
 	"github.com/rs/zerolog/log"
 )
 
@@ -56,6 +57,8 @@ func (c *TodosController) createTodo(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	c.sendNatsMessage("todo.created", newTodo)
 
 	ctx.JSON(http.StatusCreated, newTodo)
 }
@@ -133,6 +136,8 @@ func (c *TodosController) createRandomTodo(ctx *gin.Context) {
 		return
 	}
 
+	c.sendNatsMessage("todo.created", createdTodo)
+
 	ctx.JSON(http.StatusCreated, gin.H{
 		"New todo created": createdTodo,
 	})
@@ -169,6 +174,8 @@ func (c *TodosController) markTodoDone(ctx *gin.Context) {
 		Str("path", ctx.FullPath()).
 		Str("id", idParam).
 		Msg("Todo marked as done")
+
+	c.sendNatsMessage("todo.updated", todo)
 
 	ctx.JSON(http.StatusOK, gin.H{"Todo updated": todo})
 }
@@ -224,4 +231,34 @@ func validateAndLogTask(ctx *gin.Context, task string) (string, bool) {
 		Msg("todo received")
 
 	return task, true
+}
+
+func (c *TodosController) sendNatsMessage(subject string, todo Todo) {
+	natsURL := os.Getenv("NATS_URL")
+	if natsURL == "" {
+		log.Warn().Msg("NATS_URL is not set, skipping NATS message sending")
+		return
+	}
+
+	nc, err := nats.Connect(natsURL)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to NATS")
+		return
+	}
+	defer nc.Close()
+
+	var msg string
+	if subject == "todo.updated" {
+		msg = fmt.Sprintf("Todo with ID %d marked as done: %v", todo.ID, todo)
+	} else if subject == "todo.created" {
+		msg = fmt.Sprintf("New Todo with ID %d created: %v", todo.ID, todo)
+	} else {
+		log.Warn().Msg("Invalid subject, skipping NATS message sending")
+		return
+	}
+
+	if err := nc.Publish(subject, []byte(msg)); err != nil {
+		log.Error().Err(err).Msg("Failed to publish NATS message")
+		return
+	}
 }

@@ -60,6 +60,11 @@ spec:
                 configMapKeyRef:
                   name: todo-app-config
                   key: RANDOM_ARTICLE_URL
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: NATS_URL
           resources:
             requests:
               memory: "32Mi"

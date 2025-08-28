@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discord-bot
+  labels:
+    app: discord-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discord-bot
+  template:
+    metadata:
+      labels:
+        app: discord-bot
+    spec:
+      serviceAccountName: discord-bot-sa
+      containers:
+        - name: broadcaster-service
+          image: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
+          env:
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-config
+                  key: NATS_URL
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"

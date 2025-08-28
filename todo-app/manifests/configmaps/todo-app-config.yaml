@@ -10,3 +10,4 @@ data:
   IMAGE_DIR: "/usr/src/app/files/image"
   RANDOM_ARTICLE_URL: "https://en.wikipedia.org/wiki/Special:Random"
   GIN_MODE: "release"
+  NATS_URL: "nats://my-nats:4222"
