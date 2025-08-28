@@ -5,3 +5,4 @@ resources:
   - frontend-deployment.yaml
   - image-service-deployment.yaml
   - todo-service-deployment.yaml
+  - broadcaster-deployment.yaml
