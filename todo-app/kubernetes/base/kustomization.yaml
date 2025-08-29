@@ -8,6 +8,7 @@ resources:
   - shared-config/
   - shared-data/
   - todo-service/
+  - nats/
 images:
   - name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
     newName: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
