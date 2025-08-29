@@ -28,7 +28,7 @@ spec:
                     configMapKeyRef:
                       name: postgres-config
                       key: POSTGRES_PASSWORD
-              command: ["/bin/sh", "-c"]
+              command: [ "/bin/sh", "-c" ]
               args:
                 - |
                   BACKUP_FILE="/shared/todo-db-backup-$(date +%Y-%m-%d-%H%M%S).sql"
@@ -58,7 +58,7 @@ spec:
                     configMapKeyRef:
                       name: postgres-config
                       key: BUCKET_NAME
-              command: ["/bin/sh", "-c"]
+              command: [ "/bin/sh", "-c" ]
               args:
                 - |
                   gcloud auth activate-service-account --key-file=/secrets/gcs-credentials.json >/dev/null 2>&1
@@ -95,7 +95,7 @@ spec:
 
           volumes:
             - name: backup-volume
-              emptyDir: {}
+              emptyDir: { }
             - name: gcs-credentials-volume
               secret:
                 secretName: gcs-credentials
