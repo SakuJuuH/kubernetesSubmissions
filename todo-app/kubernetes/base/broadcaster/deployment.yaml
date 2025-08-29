@@ -24,7 +24,7 @@ spec:
             - name: NATS_URL
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: NATS_URL
           resources:
             requests:
