@@ -9,7 +9,7 @@ cd todo-app
 To deploy with kubectl with the persistence volume, you can use the following command:
 
 ```shell
-kubectl apply -f ../base-manifests -f base-manifests
+kubectl apply -f ../manifests -f manifests
 ```
 
 # Exercise 3.9 DBaaS vs DIY
