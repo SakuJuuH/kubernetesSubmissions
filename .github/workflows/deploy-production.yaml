@@ -16,7 +16,7 @@ env:
   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     outputs:
       frontend_image: ${{ steps.set_outputs.outputs.frontend_image }}

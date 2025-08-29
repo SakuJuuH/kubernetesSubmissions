@@ -9,4 +9,4 @@ spec:
     - ReadWriteMany
   hostPath:
     path: /tmp/shared-data
-  storageClassName: local-path
+  storageClassName: standard-rwo
