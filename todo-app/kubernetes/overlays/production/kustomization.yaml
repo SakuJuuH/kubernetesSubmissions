@@ -8,8 +8,5 @@ configMapGenerator:
   - name: broadcaster-config
     literals:
       - MODE=forward
-  - name: shared-config
-    literals:
-      - NATS_URL=
 generatorOptions:
   disableNameSuffixHash: true
