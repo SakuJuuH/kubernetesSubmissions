@@ -7,7 +7,8 @@ spec:
   project: default
   source:
     repoURL: "https://github.com/SakuJuuH/kubernetesSubmissions.git"
-    targetRevision: 4.9
+
+    targetRevision: '4.9'
     path: todo-app/kubernetes/overlays/production
   destination:
     server: "https://kubernetes.default.svc"
