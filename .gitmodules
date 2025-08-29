@@ -1,0 +1,3 @@
+[submodule "log-output-app"]
+	path = log-output-app
+	url = git@github.com:SakuJuuH/log-output-app.git
