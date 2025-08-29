@@ -2,7 +2,7 @@ name: main.yaml
 on:
   push:
     branches:
-        - '**'
+      - main
 
   release:
     types: [published]
@@ -138,3 +138,9 @@ jobs:
                   kubectl rollout status deployment image-service -n $NAMESPACE
                   kubectl rollout status deployment broadcaster-service -n $NAMESPACE
                   kubectl get services -o wide
+
+            - name: Commit kustomization.yaml to GitHub
+              uses: EndBug/add-and-commit@v9
+              with:
+                add: './manifests/kustomization.yaml'
+                message: New version released ${{ github.sha }}
