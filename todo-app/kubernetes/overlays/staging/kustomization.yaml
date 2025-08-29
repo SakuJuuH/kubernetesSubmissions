@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: staging
 resources:
 - ../../base
+- pvc.yaml
 configMapGenerator:
 - literals:
   - MODE=log-only
