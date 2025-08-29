@@ -5,6 +5,7 @@ resources:
   - frontend/
   - image-service/
   - postgres/
+  - gateway/
   - shared-config/
   - shared-data/
   - todo-service/
