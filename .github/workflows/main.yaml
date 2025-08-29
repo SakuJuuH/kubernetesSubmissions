@@ -120,7 +120,7 @@ jobs:
             - name: Deploy
               if: ${{ github.event_name == 'push' && env.SKIP_DEPLOY != 'true' }}
               run: |-
-                  cd todo-app/manifests
+                  cd manifests/
                   NAMESPACE=${{ steps.branch_sanitizer.outputs.sanitized_name }}
                   if [[ "$NAMESPACE" == "main" ]]; then
                       NAMESPACE="project"
