@@ -2,10 +2,19 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: staging
 resources:
-  - ../../base
+- ../../base
 configMapGenerator:
-  - name: broadcaster-config
-    literals:
-      - MODE=log-only
+- literals:
+  - MODE=log-only
+  name: broadcaster-config
 generatorOptions:
   disableNameSuffixHash: true
+images:
+- name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
+  newTag: bd652293b7c05b52a11e3c5955a96d897a711d30
+- name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/frontend
+  newTag: bd652293b7c05b52a11e3c5955a96d897a711d30
+- name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/image-service
+  newTag: bd652293b7c05b52a11e3c5955a96d897a711d30
+- name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/todo-service
+  newTag: bd652293b7c05b52a11e3c5955a96d897a711d30
