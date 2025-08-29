@@ -1,6 +1,20 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../todo-app/manifests/
-  - pv-shared-data.yaml
-  - pvc-shared-data.yaml
+- ../todo-app/manifests/
+- pv-shared-data.yaml
+- pvc-shared-data.yaml
+namespace: project
+images:
+- name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
+  newName: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
+  newTag: main-c4b281bd935cd0312c914a2af2ae4b27ecf9ce8c-1
+- name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/frontend
+  newName: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/frontend
+  newTag: main-c4b281bd935cd0312c914a2af2ae4b27ecf9ce8c-1
+- name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/image-service
+  newName: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/image-service
+  newTag: main-c4b281bd935cd0312c914a2af2ae4b27ecf9ce8c-1
+- name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/todo-service
+  newName: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/todo-service
+  newTag: main-c4b281bd935cd0312c914a2af2ae4b27ecf9ce8c-1
