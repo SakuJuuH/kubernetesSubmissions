@@ -25,6 +25,9 @@ jobs:
       broadcaster_service_image: ${{ steps.set_outputs.outputs.broadcaster_service_image }}
     steps:
       - uses: actions/checkout@v5.0.0
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Set image tags
         id: set_outputs
@@ -81,4 +84,3 @@ jobs:
           default_author: github_actions
           add: "todo-app/kubernetes/overlays/production/kustomization.yaml"
           message: New version released ${{ github.sha }}
-          push: origin HEAD:${{ github.head_ref }}
