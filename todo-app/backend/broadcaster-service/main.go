@@ -31,6 +31,25 @@ func main() {
 		return
 	}
 
+	mode := os.Getenv("MODE")
+	if mode == "" {
+		mode = "log-only"
+		log.Warn().Msg("MODE is not set, defaulting to log-only")
+	}
+
+	var handleEvent func(event string, todo Todo)
+	switch mode {
+	case "forward":
+		handleEvent = func(event string, todo Todo) {
+			sendDiscordEmbed(webhookURL, event, todo)
+			log.Info().Msg("Todo embed sent to Discord successfully")
+		}
+	default:
+		handleEvent = func(event string, todo Todo) {
+			log.Info().Msg("Running in log-only mode, not forwarding to Discord")
+		}
+	}
+
 	nc, err := nats.Connect(natsURL)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to connect to NATS")
@@ -44,7 +63,7 @@ func main() {
 			return
 		}
 		log.Info().Interface("todo", todo).Msg("Received todo.created event")
-		sendDiscordEmbed(webhookURL, "Todo Created", todo)
+		handleEvent("Todo Created", todo)
 	}); err != nil {
 		log.Error().Err(err).Msg("Failed to subscribe to todo.created")
 		return
@@ -57,7 +76,7 @@ func main() {
 			return
 		}
 		log.Info().Interface("todo", todo).Msg("Received todo.updated event")
-		sendDiscordEmbed(webhookURL, "Todo Updated", todo)
+		handleEvent("Todo Updated", todo)
 	}); err != nil {
 		log.Error().Err(err).Msg("Failed to subscribe to todo.updated")
 		return

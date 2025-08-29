@@ -23,8 +23,14 @@ func NewImageController(repo ImageRepository) *ImageController {
 }
 
 func (c *ImageController) welcome(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{"message": "Welcome to the image service. " +
-		"Use /api/image/current to get the current image info."})
+	ctx.JSON(http.StatusOK, gin.H{
+		"message":     "Welcome to the image todo-service. ",
+		"status_code": http.StatusOK,
+		"Endpoints": []string{
+			"GET api/image/current - Get cached image info",
+			"POST api/image/shutdown - Shutdown the server",
+		},
+	})
 }
 
 func (c *ImageController) getImageInfo(ctx *gin.Context) {

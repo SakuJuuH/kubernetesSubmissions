@@ -35,32 +35,32 @@ spec:
             - name: GIN_MODE
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: GIN_MODE
             - name: ALLOWED_ORIGINS
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: ALLOWED_ORIGINS
             - name: CACHE_DURATION_MINUTES
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: CACHE_DURATION_MINUTES
             - name: IMAGE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: IMAGE_URL
             - name: IMAGE_DIR
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: IMAGE_DIR
             - name: CACHED_IMAGE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: CACHED_IMAGE_NAME
           resources:
             requests:

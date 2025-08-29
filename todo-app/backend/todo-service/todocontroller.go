@@ -68,6 +68,14 @@ func (c *TodosController) welcome(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message":     "Welcome to the Todo API! Use /api/todos to manage your tasks.",
 		"status_code": http.StatusOK,
+		"Endpoints": []string{
+			"GET /api/todos - Retrieve all todos",
+			"POST /api/todos - Create a new todo",
+			"PUT /api/todos/:id - Mark a todo as done",
+			"POST /api/todos/random - Create a random todo",
+			"GET /api/todos/db-health - Check database connectivity",
+			"GET /api/todos/healthz - Health check endpoint",
+		},
 	})
 }
 

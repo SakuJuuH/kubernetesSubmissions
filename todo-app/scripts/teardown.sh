@@ -2,4 +2,4 @@
 
 set -e
 
-kubectl delete -k ./manifests || true
+kubectl delete -k ./kubernetes/base

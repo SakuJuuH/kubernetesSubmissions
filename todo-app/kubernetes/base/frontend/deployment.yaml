@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app-frontend
+  name: frontend
   labels:
-    app: todo-app-frontend
+    app: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: todo-app-frontend
+      app: frontend
   template:
     metadata:
-      name: todo-app-frontend
+      name: frontend
       labels:
-        app: todo-app-frontend
+        app: frontend
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
@@ -22,7 +22,7 @@ spec:
           persistentVolumeClaim:
             claimName: shared-data-pvc
       containers:
-        - name: todo-app-frontend
+        - name: frontend
           image: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/frontend
           volumeMounts:
             - name: shared-volume

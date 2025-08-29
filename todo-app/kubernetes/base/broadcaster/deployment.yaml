@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: broadcaster-service
-  labels:
-    app: broadcaster-service
 spec:
   replicas: 1
   selector:
@@ -19,6 +17,11 @@ spec:
         - name: broadcaster-service
           image: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
           env:
+            - name: MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: broadcaster-config
+                  key: MODE
             - name: NATS_URL
               valueFrom:
                 configMapKeyRef:

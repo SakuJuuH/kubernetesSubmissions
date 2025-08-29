@@ -28,13 +28,23 @@ spec:
             - name: GIN_MODE
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: GIN_MODE
             - name: ALLOWED_ORIGINS
               valueFrom:
                 configMapKeyRef:
-                  name: todo-app-config
+                  name: shared-config
                   key: ALLOWED_ORIGINS
+            - name: RANDOM_ARTICLE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shared-config
+                  key: RANDOM_ARTICLE_URL
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shared-config
+                  key: NATS_URL
             - name: POSTGRES_HOST
               valueFrom:
                 configMapKeyRef:
@@ -55,16 +65,6 @@ spec:
                 configMapKeyRef:
                   name: postgres-config
                   key: POSTGRES_PASSWORD
-            - name: RANDOM_ARTICLE_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: todo-app-config
-                  key: RANDOM_ARTICLE_URL
-            - name: NATS_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: todo-app-config
-                  key: NATS_URL
           resources:
             requests:
               memory: "32Mi"

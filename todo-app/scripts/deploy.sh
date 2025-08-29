@@ -2,4 +2,4 @@
 
 set -e
 
-kubectl apply -k ./manifests
+kubectl apply -k ./kubernetes/overlays/staging
