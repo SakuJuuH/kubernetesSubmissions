@@ -54,3 +54,4 @@
 - [4.4](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.4/ping-pong)
 - [4.5](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.5/todo-app)
 - [4.6](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.6/todo-app)
+- [4.7](https://github.com/SakuJuuH/log-output-app/tree/4.7)
