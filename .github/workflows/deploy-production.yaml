@@ -78,5 +78,7 @@ jobs:
       - name: Commit kustomization.yaml to GitHub
         uses: EndBug/add-and-commit@v9
         with:
+          default_author: github_actions
           add: "todo-app/kubernetes/overlays/production/kustomization.yaml"
           message: New version released ${{ github.sha }}
+          push: origin HEAD:${{ github.head_ref }}

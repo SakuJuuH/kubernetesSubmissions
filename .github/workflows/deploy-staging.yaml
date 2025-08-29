@@ -24,6 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5.0.0
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref }}
 
       - name: Set image tags
         id: set_outputs
@@ -77,5 +80,6 @@ jobs:
       - name: Commit kustomization.yaml to GitHub
         uses: EndBug/add-and-commit@v9
         with:
-          add: "todo-app/kubernetes/overlays/staging/kustomization.yaml"
+          default_author: github_actions
           message: New version released ${{ github.sha }}
+          add: "todo-app/kubernetes/overlays/staging/kustomization.yaml"
