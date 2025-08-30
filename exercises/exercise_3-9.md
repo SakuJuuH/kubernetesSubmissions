@@ -1,25 +1,3 @@
-# Todo app backend
-
-First navigate to the `todo-app` directory:
-
-```shell
-cd todo-app
-```
-
-To deploy in staging environment, run:
-
-```shell
-kubectl apply -f ./kubernetes/overlays/staging/
-```
-
-or in production environment, run:
-
-```shell
-kubectl apply -f ./kubernetes/overlays/production/
-```
-
-Note: The application is highly dependent on Google Cloud Artifact Registry, so deploying from here might not work.
-
 # Exercise 3.9 DBaaS vs DIY
 
 ### DBaaS (Database as a Service)
