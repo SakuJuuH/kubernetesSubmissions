@@ -1,3 +1,9 @@
 [submodule "log-output-app"]
 	path = log-output-app
 	url = https://github.com/SakuJuuH/log-output-app.git
+[submodule "todo-app-config"]
+	path = todo-app-config
+	url = https://github.com/SakuJuuH/todo-app-config.git
+[submodule "todo-app-code"]
+	path = todo-app-code
+	url = https://github.com/SakuJuuH/todo-app-code.git
