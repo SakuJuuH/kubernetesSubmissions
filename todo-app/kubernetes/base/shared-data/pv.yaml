@@ -4,9 +4,9 @@ metadata:
   name: shared-data-pv
 spec:
   capacity:
-    storage: 500Mi
+    storage: 250Mi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   hostPath:
     path: /tmp/shared-data
   storageClassName: standard-rwo

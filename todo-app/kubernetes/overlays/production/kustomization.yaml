@@ -4,7 +4,6 @@ namespace: production
 resources:
 - ../../base
 - db-backup-cronjob.yaml
-- pvc.yaml
 configMapGenerator:
 - literals:
   - MODE=forward
@@ -13,10 +12,10 @@ generatorOptions:
   disableNameSuffixHash: true
 images:
 - name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/broadcaster-service
-  newTag: d5f0b2604cb95238f133a9f5708f2c7f1eccb4b6
+  newTag: d7bab247c47b112ff98175b0da4ce54f2d3a234b
 - name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/frontend
-  newTag: d5f0b2604cb95238f133a9f5708f2c7f1eccb4b6
+  newTag: d7bab247c47b112ff98175b0da4ce54f2d3a234b
 - name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/image-service
-  newTag: d5f0b2604cb95238f133a9f5708f2c7f1eccb4b6
+  newTag: d7bab247c47b112ff98175b0da4ce54f2d3a234b
 - name: europe-west4-docker.pkg.dev/dauntless-glow-470207-m2/my-repository/todo-service
-  newTag: d5f0b2604cb95238f133a9f5708f2c7f1eccb4b6
+  newTag: d7bab247c47b112ff98175b0da4ce54f2d3a234b
