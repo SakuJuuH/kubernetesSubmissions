@@ -58,3 +58,5 @@
 - [4.7](https://github.com/SakuJuuH/log-output-app/tree/4.7)
 - [4.8](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.8)
 - [4.9](https://github.com/SakuJuuH/kubernetesSubmissions/tree/4.9/todo-app)
+- [4.10 Todo app code](https://github.com/SakuJuuH/todo-app-code/tree/4.10)
+- [4.10 Todo app config](https://github.com/SakuJuuH/todo-app-config/tree/4.10)
